@@ -17,6 +17,14 @@
   * API /data pour récupérer les données
   * API /setTargetTemperature?temperature=XX pour définir la temperature cible/max du ballin
   * API /restart pour redémarrer l'ESP
+  *
+  * Libraries
+  * RemoteDebug v2.1.2
+  * ESP8266WiFi
+  * WiFiUdp
+  * EEPROM
+  * ArduinoJson v6.20.0
+  * NTPClient v3.2.1
   */
 
 
