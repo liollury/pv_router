@@ -1,9 +1,11 @@
 #include "network.h"
 #include "const.h"
 #include "logger.h"
-#include <ESP8266WiFi.h>
+#include <WiFi.h>
 #include <EEPROM.h>
+#include <WebServer.h>
 
+WebServer server(8080);
 
 Network::Network(Measure *measure, Tank* tank) {
   this->measure = measure;
@@ -21,34 +23,34 @@ void Network::generateRestData() {
   this->jsonDocument["voltage"] = this->measure->getCurrentVoltage();
   this->jsonDocument["amp"] = this->measure->getCurrentAmp();
   serializeJson(this->jsonDocument, this->buffer);
-  this->server.send(200, "application/json", this->buffer);
+  server.send(200, "application/json", this->buffer);
 }
 
 void Network::handleTargetTemperature() {
   float temperature = server.arg("temperature").toFloat();
   if (temperature != temperature || temperature < 40 || temperature > 80) { // NaN or out of bound
-    this->server.send(400, "text/html", "<h1>Value must be float between 40 and 80</h1>");
+    server.send(400, "text/html", "<h1>Value must be float between 40 and 80</h1>");
   } else {
     EEPROM.begin(128);
     EEPROM.put(0, temperature);
     this->tank->setTargetTemperature(temperature);
     EEPROM.commit();
     EEPROM.end();
-    this->server.send(200, "text/html", "<h1>OK</h1>");
+    server.send(200, "text/html", "<h1>OK</h1>");
   }
   
 }
 
 void Network::handleOnConnect() {
-  this->server.send(200, "text/html", "<h1>OK</h1>");
+  server.send(200, "text/html", "<h1>OK</h1>");
 }
 
 void Network::handleNotFound() {
-  this->server.send(404, "text/html", "<h1>404 Not Found</h1>"); 
+  server.send(404, "text/html", "<h1>404 Not Found</h1>"); 
 }
 
 void Network::handleRestart() {
-  this->server.send(200, "application/json", "{\"response\": \"ok\"}"); 
+  server.send(200, "application/json", "{\"response\": \"ok\"}"); 
   delay(1000);
   ESP.restart();
 }
@@ -71,13 +73,13 @@ void Network::setupWifi() {
 
 void Network::setupWebServer() {
   //Init Web Server on port 80
-  log("[WebServer] Starting HTTP server...");
-  this->server.on("/", [=](){handleOnConnect();}); // lambda function with [=] to pass "this"
-  this->server.on("/data", [=](){generateRestData();});
-  this->server.on("/setTargetTemperature", [=](){handleTargetTemperature();});
-  this->server.on("/restart", [=](){handleRestart();});
-  this->server.onNotFound([=](){handleNotFound();});
-  this->server.begin();
+  log("[WebServer] Starting HTTP server..");
+  server.on("/", [=](){handleOnConnect();}); // lambda function with [=] to pass "this"
+  server.on("/data", [=](){generateRestData();});
+  server.on("/setTargetTemperature", [=](){handleTargetTemperature();});
+  server.on("/restart", [=](){handleRestart();});
+  server.onNotFound([=](){handleNotFound();});
+  server.begin();
   log("[WebServer] HTTP server started");
   log("[WebServer] Liveness endpoint : http://" + WiFi.localIP().toString() + ":8080/");
   log("[WebServer] Data endpoint : http://" + WiFi.localIP().toString() + ":8080/data");

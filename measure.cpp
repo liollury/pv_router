@@ -1,5 +1,6 @@
 #include "const.h"
 #include "measure.h"
+#include "logger.h"
 #include <Arduino.h>
 
 Measure* instance;
@@ -25,12 +26,11 @@ Measure::Measure(Tank* tank) {
     this->ampM[i] = 0;
   }
 
-
   attachInterrupt(ZeroCross, zeroCrossInterruptHandler, RISING);
-  // this->timer = timerBegin(0, 80, true);  //Clock Divider, 1 micro second Tick
-  // timerAttachInterrupt(this->timer, onTimerInterruptHandler, true);
-  // timerAlarmWrite(this->timer, 100, true);  //Interrupt every 100 Ticks or microsecond
-  // timerAlarmEnable(this->timer);
+  this->timer = timerBegin(0, 80, true);  //Clock Divider, 1 micro second Tick
+  timerAttachInterrupt(this->timer, onTimerInterruptHandler, true);
+  timerAlarmWrite(this->timer, 100, true);  //Interrupt every 100 Ticks or microsecond
+  timerAlarmEnable(this->timer);
 }
 
 void IRAM_ATTR Measure::zeroCrossInterrupt() {
@@ -71,6 +71,7 @@ void Measure::computePower() {
   float current;
   float rmsCurrent = 0;
   this->pW = 0;
+
   for (int i = 0; i < 100; i++) {
     voltM[i] = (19 * voltM[i] + float(volt[i])) / 20;  //Mean value. First Order Filter. Short Integration
     voltage = kV * voltM[i];
@@ -102,6 +103,7 @@ void Measure::computeTriacDelay() {
   } else {
     this->triacDelay = 100;
   }
+  this->triacDelay = 50;
 }
 
 void Measure::update() {

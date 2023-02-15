@@ -1,12 +1,14 @@
 /**
   * Network gere le wifi et l'API rest
   * Measure gere les mesure et le triac
-  * TODO : Timer interruption quand ESP32
   * Time gere le NTP et les heures de fonctionnement
   * Tank represente le ballon avec ses temperatures
   * Const les constantes
   * Logger le logger qui utilise Serial et RemoteDebug
   *  => pour accéder aux log en remote => putty en telnet
+  *
+  * Upload par wifi possible (sketch => port => wifi)
+  *
   *
   *
   * Fonctionnement :
@@ -30,16 +32,17 @@
 
 #include "network.h"
 #include "measure.h"
-#include "time.h"
+#include "clock.h"
 #include "logger.h"
 #include "const.h"
 #include <EEPROM.h>
+#include <ArduinoOTA.h>
 
 
 Tank tank;
 Measure measure(&tank);
 Network network(&measure, &tank);
-Time ntpTime(&measure, &tank);
+Clock routerClock(&measure, &tank);
 
 unsigned long previousBlinkMillis;
 bool blink = false;
@@ -62,16 +65,20 @@ void setup() {
   readEEPROM();
   network.setup();
   previousBlinkMillis = millis();
+  tank.update();
+  initOTA();
 }
+
 
 void loop() {
   pinMode(LedRed, OUTPUT);
   pinMode(LedGreen, OUTPUT);
   measure.update();
   network.update();
-  ntpTime.update();
+  routerClock.update();
+  tank.update();
 
-  if (millis() - previousBlinkMillis >= 2000) {
+   if (millis() - previousBlinkMillis >= 2000) {
     blink = !blink;
     if (blink) {
       previousBlinkMillis = millis() - 1950;
@@ -87,4 +94,38 @@ void loop() {
     }
   }
   Debug.handle();
+  ArduinoOTA.handle();
+}
+
+void initOTA() {
+  ArduinoOTA.setPort(3232);
+  ArduinoOTA.setHostname("ESP32-PVRouter");
+  ArduinoOTA.setPassword(OTA_PASSWD);
+
+  ArduinoOTA.onStart([]() {
+    String type;
+    if (ArduinoOTA.getCommand() == U_FLASH)
+      type = "sketch";
+    else // U_SPIFFS
+      type = "filesystem";
+
+    // NOTE: if updating SPIFFS this would be the place to unmount SPIFFS using SPIFFS.end()
+    log("Start updating " + type);
+  })
+  .onEnd([]() {
+    log("\nEnd");
+  })
+  .onProgress([](unsigned int progress, unsigned int total) {
+    Serial.printf("Progress: %u%%\r", (progress / (total / 100)));
+  })
+  .onError([](ota_error_t error) {
+    Serial.printf("Error[%u]: ", error);
+    if (error == OTA_AUTH_ERROR) { log("Auth Failed"); }
+    else if (error == OTA_BEGIN_ERROR) { log("Begin Failed"); }
+    else if (error == OTA_CONNECT_ERROR) { log("Connect Failed"); }
+    else if (error == OTA_RECEIVE_ERROR) { log("Receive Failed"); }
+    else if (error == OTA_END_ERROR) { log("End Failed"); }
+  });
+
+  ArduinoOTA.begin();
 }

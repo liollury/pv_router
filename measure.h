@@ -15,7 +15,7 @@ class Measure {
     volatile bool phasePositive = true;
     int currentTriacPosition = 0;
     volatile int zeroCrossingMs = 0;
-    // hw_timer_t* timer = NULL;
+    hw_timer_t* timer = NULL;
   public:
     float pW;
     float pVA;

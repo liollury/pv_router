@@ -1,6 +1,7 @@
+#include <HTTP_Method.h>
+#include <Uri.h>
 #include "tank.h"
 #include "measure.h"
-#include <ESP8266WebServer.h>
 #include <ArduinoJson.h>
 
 #ifndef Network_h
@@ -13,7 +14,6 @@ class Network {
     unsigned long previousWifiMillis;
     Measure* measure;
     Tank* tank;
-    ESP8266WebServer server = ESP8266WebServer(8080);
     void setupWifi();
     void setupWebServer();
     void generateRestData();

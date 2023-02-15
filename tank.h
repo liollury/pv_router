@@ -1,4 +1,6 @@
 #include "const.h"
+#include <OneWire.h>
+#include <DallasTemperature.h>
 
 #ifndef Tank_h
 #define Tank_h
@@ -7,6 +9,7 @@ class Tank {
     int mode = TANK_MODE_AUTO;
     float temperature = 45.5;
     float targetTemperature = 70;
+    unsigned long previousComputeMillis;
   public:
     Tank();
     void setMode(int mode);
@@ -16,5 +19,6 @@ class Tank {
     void setTargetTemperature(float temperature);
     float getTargetTemperature();
     bool reachedTargetTemperature();
+    void update();
 };
 #endif
