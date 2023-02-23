@@ -20,6 +20,7 @@ void Network::generateRestData() {
   this->jsonDocument["triacPosition"] = 100 - this->measure->triacDelay; // (100 - delay)%
   this->jsonDocument["overProduction"] = this->measure->overProduction;
   this->jsonDocument["consumption"] = this->measure->Wh / 1000;
+  this->jsonDocument["instant"] = this->measure->pW;
   this->jsonDocument["voltage"] = this->measure->getCurrentVoltage();
   this->jsonDocument["amp"] = this->measure->getCurrentAmp();
   serializeJson(this->jsonDocument, this->buffer);

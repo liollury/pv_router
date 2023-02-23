@@ -8,6 +8,8 @@ class Measure {
     int amp[100];
     float voltM[100];
     float ampM[100];
+    float voltage = 0;
+    float current = 0;
     int refVolt;
     Tank* tank;
     unsigned long previousComputeMillis;

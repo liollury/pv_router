@@ -56,6 +56,9 @@ void Measure::measurePower() {
   int index;
   this->refVolt = analogRead(AnalogRef);
   unsigned long MeasureMillis = millis();
+  /*Serial.print(this->refVolt);
+  Serial.print('-');
+  Serial.println(analogRead(AnalogAmp));*/
 
   while (millis() - MeasureMillis < 21) {                             //Read values in continuous during 20ms. One loop is around 150 micro seconds
     index = ((micros() % 20000) / 200 + 100 - zeroCrossingMs) % 100;  //We have more results that we need during 20ms to fill the tables of 100 samples
@@ -82,12 +85,17 @@ void Measure::computePower() {
     this->pW += voltage * current;
   }
   rmsVoltage = sqrt(rmsVoltage / 100);  //RMS voltage
+  this->voltage = rmsVoltage;
+  // log(rmsVoltage);
   rmsCurrent = sqrt(rmsCurrent / 100);  //RMS current
+  // log(rmsCurrent);
+  this->current = rmsCurrent;
   this->pW = this->pW / 100;
   this->pVA = floor(rmsVoltage * rmsCurrent);
   this->powerFactor = floor(100 * pW / pVA) / 100;
   this->Wh += this->pW / 90000;  // Watt Hour, Every 40ms
   this->pW = floor(this->pW);
+  // log(this->pW);
 }
 
 void Measure::computeTriacDelay() {
@@ -103,7 +111,7 @@ void Measure::computeTriacDelay() {
   } else {
     this->triacDelay = 100;
   }
-  this->triacDelay = 50;
+  // log(this->triacDelay);
 }
 
 void Measure::update() {
@@ -112,6 +120,7 @@ void Measure::update() {
     this->measurePower();
     this->computePower();
     this->computeTriacDelay();
+    // log(this->currentTriacPosition);
   }
 }
 
@@ -120,9 +129,9 @@ void Measure::resetWh() {
 }
 
 float Measure::getCurrentVoltage() {
-  return this->voltM[25];
+  return this->voltage;
 }
 
 float Measure::getCurrentAmp() {
-  return this->ampM[25];
+  return this->current;
 }

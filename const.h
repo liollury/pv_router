@@ -13,13 +13,13 @@ static const int AnalogVolt = 32;
 static const int AnalogAmp = 33;
 static const int ZeroCross = 23;
 static const int PulseTriac = 22;
-static const int LedRed = 18;
-static const int LedGreen = 19;
+static const int LedRed = 19;
+static const int LedGreen = 21;
 static const int dallasOneWire = 14;
 
 //CALIBRATION
-static const float kV = 0.2083;    //Calibration coefficient for the voltage. To be adjusted
-static const float kI = 0.114942;    //Calibration coefficient for the current. To be adjusted
+static const float kV = 0.18453;    //Calibration coefficient for the voltage. To be adjusted
+static const float kI = 0.048203;    //Calibration coefficient for the current. To be adjusted
 
 //TANK MODES
 static const int TANK_MODE_AUTO = 0;
