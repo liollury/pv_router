@@ -58,7 +58,23 @@ void readEEPROM() {
   EEPROM.end();
 }
 
+void initSequence() {
+  digitalWrite(LedRed, HIGH);
+  delay(500);
+  digitalWrite(LedRed, LOW);
+  digitalWrite(LedGreen, HIGH);
+  delay(500);
+  digitalWrite(LedGreen, LOW);
+  digitalWrite(LedBlue, HIGH);
+  delay(500);
+  digitalWrite(LedBlue, LOW);
+}
+
 void setup() { 
+  pinMode(LedRed, OUTPUT);
+  pinMode(LedGreen, OUTPUT);
+  pinMode(LedBlue, OUTPUT);
+  initSequence();
   Debug.begin(esp_name);
   Serial.begin(115200);
   log("[Sys] Booting");
@@ -71,8 +87,6 @@ void setup() {
 
 
 void loop() {
-  pinMode(LedRed, OUTPUT);
-  pinMode(LedGreen, OUTPUT);
   measure.update();
   network.update();
   routerClock.update();
@@ -91,6 +105,11 @@ void loop() {
     } else {
       digitalWrite(LedRed, blink);
       digitalWrite(LedGreen, LOW);
+    }
+    if ((tank.getMode() & TANK_MODE_ON_MASK) > 0) {
+      digitalWrite(LedBlue, HIGH);      
+    } else {
+      digitalWrite(LedBlue, LOW);
     }
   }
   Debug.handle();

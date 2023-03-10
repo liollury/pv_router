@@ -30,10 +30,12 @@ void Clock::update() {
       this->measure->resetWh(); // Reset Watt Hour of the day. Once every day
     }
     // Turn off tank at night
-    if (hour >= 19 || hour <= 8) {
-      this->tank->setMode(TANK_MODE_OFF);
-    } else { 
-      this->tank->setMode(TANK_MODE_AUTO);
+    if ((this->tank->getMode() & TANK_MODE_AUTO_MASK) > 0) {
+      if ((hour >= 19 || hour <= 8)) {
+        this->tank->setMode(TANK_MODE_AUTO_OFF);
+      } else { 
+        this->tank->setMode(TANK_MODE_AUTO_ON);
+      }
     }
     this->lastHour = hour;
   }

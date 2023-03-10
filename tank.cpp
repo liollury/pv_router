@@ -13,7 +13,7 @@ Tank::Tank() {
 
 void Tank::setMode(int mode) {
   if (this->mode != mode) {
-    log("[Tank] New mode: " + mode);
+    log("[Tank] New mode: " + String(mode));
   }
   this->mode = mode;
 }

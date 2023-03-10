@@ -18,6 +18,7 @@ class Network {
     void setupWebServer();
     void generateRestData();
     void handleOnConnect();
+    void handleTankMode();
     void handleTargetTemperature();
     void handleRestart();
     void handleNotFound();

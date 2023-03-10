@@ -99,10 +99,10 @@ void Measure::computePower() {
 }
 
 void Measure::computeTriacDelay() {
-  if (this->tank->getMode() == TANK_MODE_AUTO && !this->tank->reachedTargetTemperature()) {
+  if ((this->tank->getMode() & TANK_MODE_ON_MASK) > 0 && !this->tank->reachedTargetTemperature()) {    
     float delay = this->triacDelay + this->pW / 200;  //Decrease/Increase delay to increase/Decrease Triac conduction
-    if (delay < 0) { 
-      delay = 0; 
+    if (delay < minTriacDelay || this->tank->getMode() == TANK_MODE_ON) { 
+      delay = minTriacDelay; 
     } else if (delay > 100) {
       delay = 100; 
     }
@@ -111,7 +111,6 @@ void Measure::computeTriacDelay() {
   } else {
     this->triacDelay = 100;
   }
-  // log(this->triacDelay);
 }
 
 void Measure::update() {
@@ -120,7 +119,6 @@ void Measure::update() {
     this->measurePower();
     this->computePower();
     this->computeTriacDelay();
-    // log(this->currentTriacPosition);
   }
 }
 

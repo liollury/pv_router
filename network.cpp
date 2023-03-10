@@ -20,6 +20,7 @@ void Network::generateRestData() {
   this->jsonDocument["triacPosition"] = 100 - this->measure->triacDelay; // (100 - delay)%
   this->jsonDocument["overProduction"] = this->measure->overProduction;
   this->jsonDocument["consumption"] = this->measure->Wh / 1000;
+  this->jsonDocument["tankMode"] = this->tank->getMode();
   this->jsonDocument["instant"] = this->measure->pW;
   this->jsonDocument["voltage"] = this->measure->getCurrentVoltage();
   this->jsonDocument["amp"] = this->measure->getCurrentAmp();
@@ -39,7 +40,16 @@ void Network::handleTargetTemperature() {
     EEPROM.end();
     server.send(200, "text/html", "<h1>OK</h1>");
   }
-  
+}
+
+void Network::handleTankMode() {
+  float mode = server.arg("mode").toInt();
+  if (mode < 0 || mode > 3) { // NaN or out of bound
+    server.send(400, "text/html", "<h1>Value must be int [0=off, 1=auto_off, 2=on, 3=auto_on]</h1>");
+  } else {
+    this->tank->setMode(mode);
+    server.send(200, "text/html", "<h1>OK</h1>");
+  }
 }
 
 void Network::handleOnConnect() {
@@ -78,6 +88,7 @@ void Network::setupWebServer() {
   server.on("/", [=](){handleOnConnect();}); // lambda function with [=] to pass "this"
   server.on("/data", [=](){generateRestData();});
   server.on("/setTargetTemperature", [=](){handleTargetTemperature();});
+  server.on("/setTankMode", [=](){handleTankMode();});
   server.on("/restart", [=](){handleRestart();});
   server.onNotFound([=](){handleNotFound();});
   server.begin();
@@ -85,6 +96,7 @@ void Network::setupWebServer() {
   log("[WebServer] Liveness endpoint : http://" + WiFi.localIP().toString() + ":8080/");
   log("[WebServer] Data endpoint : http://" + WiFi.localIP().toString() + ":8080/data");
   log("[WebServer] Data endpoint : http://" + WiFi.localIP().toString() + ":8080/setTargetTemperature?temperature=XX");
+  log("[WebServer] Data endpoint : http://" + WiFi.localIP().toString() + ":8080/setTankMode?mode=[0=off, 1=auto_off, 2=on, 3=auto_on]");
   log("[WebServer] Restart endpoint : http://" + WiFi.localIP().toString() + ":8080/restart");
 }
 
