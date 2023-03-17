@@ -21,7 +21,8 @@ static const int dallasOneWire = 14;
 //CALIBRATION
 static const float kV = 0.18453;    //Calibration coefficient for the voltage. To be adjusted
 static const float kI = 0.085; // valeur avec bouilloir : 0.048203 valeur avec linky : 0.052988   //Calibration coefficient for the current. To be adjusted
-static const int minTriacDelay = 80; // maxLoadPower = 100% - minTriacDelay * loadPower. eg.: minTriacDelay = 80, load = 3kw, maxLoadPower = 3000 * 20% = 600w
+static const int minTriacDelay = 60; // 0-100; maxLoadPower = 100% - minTriacDelay * loadPower. eg.: minTriacDelay = 80, load = 3kw, maxLoadPower = 3000 * 20% = 600w
+static const int powerMargin = 30; // Allowable injection (W)
 
 //TANK MODES
 static const int TANK_MODE_AUTO_ON = 0b11;
