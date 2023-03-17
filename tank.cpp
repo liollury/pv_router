@@ -56,7 +56,9 @@ void Tank::update() {
   if (millis() - this->previousComputeMillis > 1000) {
     sensor.requestTemperatures();
     float temperatureC = sensor.getTempCByIndex(0);
-    this->setTemperature(temperatureC);
+    if (temperatureC > 0) {
+      this->setTemperature(temperatureC);
+    }
     this->previousComputeMillis = millis();
   }
 }
