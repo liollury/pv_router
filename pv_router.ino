@@ -1,4 +1,5 @@
 /**
+  * Board : NodeMCU-32S de la lib esp32 espressif 1.0.6 https://dl.espressif.com/dl/package_esp32_index.json
   * Network gere le wifi et l'API rest
   * Measure gere les mesure et le triac
   * Time gere le NTP et les heures de fonctionnement
@@ -74,6 +75,8 @@ void setup() {
   pinMode(LedRed, OUTPUT);
   pinMode(LedGreen, OUTPUT);
   pinMode(LedBlue, OUTPUT);
+  // secure triac to low
+  measure.stopTriac();
   initSequence();
   Debug.begin(esp_name);
   Serial.begin(115200);
@@ -84,7 +87,6 @@ void setup() {
   tank.update();
   initOTA();
 }
-
 
 void loop() {
   measure.update();

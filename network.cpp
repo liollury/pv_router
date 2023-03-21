@@ -21,9 +21,12 @@ void Network::generateRestData() {
   this->jsonDocument["overProduction"] = this->measure->overProduction;
   this->jsonDocument["consumption"] = this->measure->Wh / 1000;
   this->jsonDocument["tankMode"] = this->tank->getMode();
-  this->jsonDocument["instant"] = this->measure->pW;
-  this->jsonDocument["voltage"] = this->measure->getCurrentVoltage();
-  this->jsonDocument["amp"] = this->measure->getCurrentAmp();
+  this->jsonDocument["powerConnected"] = this->measure->isPowerConnected;
+  if (this->measure->isPowerConnected) {
+    this->jsonDocument["instant"] = this->measure->pW;
+    this->jsonDocument["voltage"] = this->measure->getCurrentVoltage();
+    this->jsonDocument["amp"] = this->measure->getCurrentAmp();
+  }
   serializeJson(this->jsonDocument, this->buffer);
   server.send(200, "application/json", this->buffer);
 }
@@ -62,6 +65,7 @@ void Network::handleNotFound() {
 
 void Network::handleRestart() {
   server.send(200, "application/json", "{\"response\": \"ok\"}"); 
+  this->measure->stopTriac();
   delay(1000);
   ESP.restart();
 }
@@ -72,6 +76,7 @@ void Network::setupWifi() {
   WiFi.begin(ssid, password);
   while (WiFi.waitForConnectResult() != WL_CONNECTED) {
     log("[WiFi] Connection Failed! Rebooting...");
+    this->measure->stopTriac();
     delay(5000);
     ESP.restart();
   }
@@ -108,6 +113,8 @@ void Network::wifiWatchdog() {
       log("[WiFi] Connection Failed! #" + String(WIFIbug));
       this->WIFIbug++;
       if (this->WIFIbug > 20) {
+        this->measure->stopTriac();
+        delay(1000);
         ESP.restart();
       }
     } else {

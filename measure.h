@@ -21,7 +21,8 @@ class Measure {
   public:
     float pW;
     float pVA;
-    float Wh = 0; 
+    float Wh = 0;
+    bool isPowerConnected = false; 
     float powerFactor;
     int triacDelay = 100;
     bool overProduction = false;
@@ -33,6 +34,7 @@ class Measure {
     void resetWh();
     void zeroCrossInterrupt();
     void onTimerInterrupt();
+    void stopTriac();
     float getCurrentVoltage();
     float getCurrentAmp();
 };

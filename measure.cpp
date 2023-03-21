@@ -47,7 +47,7 @@ void IRAM_ATTR Measure::zeroCrossInterrupt() {
 
 void IRAM_ATTR Measure::onTimerInterrupt() {  //Interruption every 100 micro second
   this->currentTriacPosition += 1;
-  if (this->currentTriacPosition > this->triacDelay && this->triacDelay < 98) {  //100 steps in 10 ms
+  if (this->currentTriacPosition > this->triacDelay && this->triacDelay < 98 && this->isPowerConnected) {  //100 steps in 10 ms
     digitalWrite(PulseTriac, HIGH); //Activate Triac
   }
 }
@@ -90,16 +90,23 @@ void Measure::computePower() {
   rmsCurrent = sqrt(rmsCurrent / 100);  //RMS current
   // log(rmsCurrent);
   this->current = rmsCurrent;
-  this->pW = this->pW / 100;
-  this->pVA = floor(rmsVoltage * rmsCurrent);
-  this->powerFactor = floor(100 * pW / pVA) / 100;
-  this->Wh += this->pW / 90000;  // Watt Hour, Every 40ms
-  this->pW = floor(this->pW);
+  this->isPowerConnected = (rmsVoltage > 190 && rmsVoltage < 280);
+  if (this->isPowerConnected) {
+    this->pW = this->pW / 100;
+    this->pVA = floor(rmsVoltage * rmsCurrent);
+    this->powerFactor = floor(100 * pW / pVA) / 100;
+    this->Wh += this->pW / 90000;  // Watt Hour, Every 40ms
+    this->pW = floor(this->pW);
+  } else {
+    this->pW = 0;
+    this->pVA = 0;
+    this->powerFactor = 0;
+  }
   // log(this->pW);
 }
 
 void Measure::computeTriacDelay() {
-  if ((this->tank->getMode() & TANK_MODE_ON_MASK) > 0 && !this->tank->reachedTargetTemperature()) {    
+  if ((this->tank->getMode() & TANK_MODE_ON_MASK) > 0 && !this->tank->reachedTargetTemperature() && this->isPowerConnected) {    
     float delay = this->triacDelay + (this->pW + powerMargin) / 200;  //Decrease/Increase delay to increase/Decrease Triac conduction
     if (delay < minTriacDelay || this->tank->getMode() == TANK_MODE_ON) { 
       delay = minTriacDelay; 
@@ -109,6 +116,7 @@ void Measure::computeTriacDelay() {
     this->overProduction = delay < 100;
     this->triacDelay = int(delay);
   } else {
+    digitalWrite(PulseTriac, LOW);
     this->triacDelay = 100;
   }
 }
@@ -124,6 +132,10 @@ void Measure::update() {
 
 void Measure::resetWh() {
   this->Wh = 0;
+}
+
+void Measure::stopTriac() {
+    digitalWrite(PulseTriac, LOW);
 }
 
 float Measure::getCurrentVoltage() {
