@@ -47,7 +47,7 @@ void IRAM_ATTR Measure::zeroCrossInterrupt() {
 
 void IRAM_ATTR Measure::onTimerInterrupt() {  //Interruption every 100 micro second
   this->currentTriacPosition += 1;
-  if (this->currentTriacPosition > this->triacDelay && this->triacDelay < 98 && this->isPowerConnected) {  //100 steps in 10 ms
+  if (this->currentTriacPosition > this->triacDelay && this->triacDelay < 98 && this->isPowerConnected && !this->syncLost) {  //100 steps in 10 ms
     digitalWrite(PulseTriac, HIGH); //Activate Triac
   }
 }
@@ -127,6 +127,18 @@ void Measure::update() {
     this->measurePower();
     this->computePower();
     this->computeTriacDelay();
+    if (millis() - this->lastZeroCrossInterruption > 500) {
+      if (!this->syncLost) {
+        log("Zero crossing sync lost");
+      }
+      this->syncLost = true;
+      this->stopTriac();
+    } else {
+      if (this->syncLost) {
+        log("Zero crossing sync restored");
+      }
+      this->syncLost = false;      
+    }
   }
 }
 

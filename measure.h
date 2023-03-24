@@ -18,6 +18,7 @@ class Measure {
     int currentTriacPosition = 0;
     volatile int zeroCrossingMs = 0;
     hw_timer_t* timer = NULL;
+    bool syncLost = false;
   public:
     float pW;
     float pVA;
