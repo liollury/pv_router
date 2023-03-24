@@ -9,6 +9,8 @@ DallasTemperature sensor(&oneWire);
 Tank::Tank() {
   this->previousComputeMillis = millis();
   sensor.begin();
+  sensor.setWaitForConversion(false);
+  sensor.requestTemperatures();
 }
 
 void Tank::setMode(int mode) {
@@ -53,12 +55,12 @@ bool Tank::reachedTargetTemperature() {
 }
 
 void Tank::update() {
-  if (millis() - this->previousComputeMillis > 1000) {
-    sensor.requestTemperatures();
+  if (millis() - this->previousComputeMillis > 2000) {
     float temperatureC = sensor.getTempCByIndex(0);
     if (temperatureC > 0) {
       this->setTemperature(temperatureC);
     }
     this->previousComputeMillis = millis();
+    sensor.requestTemperatures();
   }
 }

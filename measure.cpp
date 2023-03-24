@@ -129,13 +129,13 @@ void Measure::update() {
     this->computeTriacDelay();
     if (millis() - this->lastZeroCrossInterruption > 500) {
       if (!this->syncLost) {
-        log("Zero crossing sync lost");
+        log("[Measure] Zero crossing sync lost");
       }
       this->syncLost = true;
       this->stopTriac();
     } else {
       if (this->syncLost) {
-        log("Zero crossing sync restored");
+        log("[Measure] Zero crossing sync restored");
       }
       this->syncLost = false;      
     }
