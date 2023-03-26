@@ -40,9 +40,9 @@
 #include <EEPROM.h>
 #include <ArduinoOTA.h>
 
-
-Tank tank;
-Measure measure(&tank);
+Temperature temperature;
+Tank tank(&temperature);
+Measure measure(&tank, &temperature);
 Network network(&measure, &tank);
 Clock routerClock(&measure, &tank);
 
@@ -95,6 +95,7 @@ void loop() {
   measure.update();
   network.update();
   routerClock.update();
+  temperature.update();
   tank.update();
 
    if (millis() - previousBlinkMillis >= 2000) {

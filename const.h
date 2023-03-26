@@ -7,6 +7,11 @@
 static const char* ssid = SECRET_WIFI_SSID;
 static const char* password = SECRET_WIFI_PASSWORD;
 
+//ONE WIRE - to determinate with READ_ONE_WIRE_SENSORS_ADDRESS to print addresses
+#define READ_ONE_WIRE_SENSORS_ADDRESS
+static uint8_t TankOneWireTempSensor[8] = { 0x28, 0x06, 0xBD, 0x49, 0xF6, 0x8D, 0x3C, 0x9B };
+static uint8_t TriacOneWireTempSensor[8] = { 0x28, 0x29, 0x86, 0x48, 0xF6, 0x33, 0x3C, 0xAC };
+
 //PINS - GPIO
 static const int AnalogRef = 35;
 static const int AnalogVolt = 32;

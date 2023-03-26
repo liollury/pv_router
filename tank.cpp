@@ -3,14 +3,10 @@
 #include "const.h"
 #include <Arduino.h>
 
-OneWire oneWire(dallasOneWire);
-DallasTemperature sensor(&oneWire);
 
-Tank::Tank() {
+Tank::Tank(Temperature* temperatureSensor) {
   this->previousComputeMillis = millis();
-  sensor.begin();
-  sensor.setWaitForConversion(false);
-  sensor.requestTemperatures();
+  this->temperatureSensor = temperatureSensor;
 }
 
 void Tank::setMode(int mode) {
@@ -56,11 +52,10 @@ bool Tank::reachedTargetTemperature() {
 
 void Tank::update() {
   if (millis() - this->previousComputeMillis > 2000) {
-    float temperatureC = sensor.getTempCByIndex(0);
+    float temperatureC = this->temperatureSensor->getTemperature(TankOneWireTempSensor);
     if (temperatureC > 0) {
       this->setTemperature(temperatureC);
     }
     this->previousComputeMillis = millis();
-    sensor.requestTemperatures();
   }
 }
