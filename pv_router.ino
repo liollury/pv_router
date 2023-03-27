@@ -1,5 +1,6 @@
 /**
   * Board : NodeMCU-32S de la lib esp32 espressif 1.0.6 https://dl.espressif.com/dl/package_esp32_index.json
+  * Board : NodeMCU-32S de la lib esp32 espressif 2.0.7 (experimental) https://raw.githubusercontent.com/espressif/arduino-esp32/gh-pages/package_esp32_index.json
   * Network gere le wifi et l'API rest
   * Measure gere les mesure et le triac
   * Time gere le NTP et les heures de fonctionnement
@@ -75,6 +76,8 @@ void setup() {
   pinMode(LedRed, OUTPUT);
   pinMode(LedGreen, OUTPUT);
   pinMode(LedBlue, OUTPUT);
+  // mandatory in 2.0.7 NodeMCU-32S board, interrupt cannot be set before setup
+  measure.init();
   // secure triac to low
   measure.stopTriac();
   initSequence();

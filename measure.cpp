@@ -17,6 +17,9 @@ Measure::Measure(Tank* tank) {
   instance = this;
   this->tank = tank;
   this->previousComputeMillis = millis();
+}
+
+void Measure::init() {
   pinMode(ZeroCross, INPUT);
   pinMode(PulseTriac, OUTPUT);
   digitalWrite(PulseTriac, LOW);

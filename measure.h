@@ -28,6 +28,7 @@ class Measure {
     int triacDelay = 100;
     bool overProduction = false;
     Measure(Tank* tank);
+    void init();
     void measurePower();
     void computePower();
     void computeTriacDelay();
