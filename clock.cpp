@@ -31,7 +31,7 @@ void Clock::update() {
     }
     // Turn off tank at night
     if ((this->tank->getMode() & TANK_MODE_AUTO_MASK) > 0) {
-      if ((hour >= 19 || hour <= 8)) {
+      if ((hour >= 19 || hour < 8)) {
         this->tank->setMode(TANK_MODE_AUTO_OFF);
       } else { 
         this->tank->setMode(TANK_MODE_AUTO_ON);
