@@ -8,8 +8,8 @@
 #define Network_h
 class Network {
   private:
-    StaticJsonDocument<250> jsonDocument;
-    char buffer[250];
+    StaticJsonDocument<270> jsonDocument;
+    char buffer[270];
     int WIFIbug = 0;
     unsigned long previousWifiMillis;
     Measure* measure;

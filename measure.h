@@ -12,7 +12,9 @@ class Measure {
     float current = 0;
     int refVolt;
     Tank* tank;
+    Temperature* temperatureSensor;
     unsigned long previousComputeMillis;
+    unsigned long previousTemperatureMillis;
     volatile unsigned long lastZeroCrossInterruption = 0;
     volatile bool phasePositive = true;
     int currentTriacPosition = 0;
@@ -26,8 +28,9 @@ class Measure {
     bool isPowerConnected = false; 
     float powerFactor;
     int triacDelay = 100;
+    float triacTemperature;
     bool overProduction = false;
-    Measure(Tank* tank);
+    Measure(Tank* tank, Temperature* temperatureSensor);
     void init();
     void measurePower();
     void computePower();

@@ -1,6 +1,5 @@
 #include "const.h"
-#include <OneWire.h>
-#include <DallasTemperature.h>
+#include "temperature.h"
 
 #ifndef Tank_h
 #define Tank_h
@@ -10,8 +9,9 @@ class Tank {
     float temperature = 45.5;
     float targetTemperature = 70;
     unsigned long previousComputeMillis;
+    Temperature* temperatureSensor;
   public:
-    Tank();
+    Tank(Temperature* temperatureSensor);
     void setMode(int mode);
     int getMode();
     void setTemperature(float temperature);

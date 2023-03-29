@@ -17,6 +17,7 @@ void Network::generateRestData() {
   this->jsonDocument.clear();
   this->jsonDocument["tankTemperature"] = this->tank->getTemperature();
   this->jsonDocument["tankTargetTemperature"] = this->tank->getTargetTemperature();
+  this->jsonDocument["triacTemperature"] = this->measure->triacTemperature;
   this->jsonDocument["triacPosition"] = 100 - this->measure->triacDelay; // (100 - delay)%
   this->jsonDocument["overProduction"] = this->measure->overProduction;
   this->jsonDocument["consumption"] = this->measure->Wh / 1000;

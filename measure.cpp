@@ -13,9 +13,10 @@ void IRAM_ATTR onTimerInterruptHandler() {
   instance->onTimerInterrupt();
 }
 
-Measure::Measure(Tank* tank) {
+Measure::Measure(Tank* tank, Temperature* temperatureSensor) {
   instance = this;
   this->tank = tank;
+  this->temperatureSensor = temperatureSensor;
   this->previousComputeMillis = millis();
 }
 
@@ -141,6 +142,17 @@ void Measure::update() {
         log("[Measure] Zero crossing sync restored");
       }
       this->syncLost = false;      
+    }
+  }
+
+  if (millis() - this->previousTemperatureMillis > 5000) {
+    this->previousTemperatureMillis = millis();
+    float temperature = this->temperatureSensor->getTemperature(TriacOneWireTempSensor);
+    if (temperature > 0) {
+      this->triacTemperature = temperature;
+      char cMsg[40];
+      sprintf(cMsg, "[Measure] triac temperature: %fC", temperature);
+      log(cMsg);
     }
   }
 }
