@@ -83,8 +83,6 @@ void Network::setupWifi() {
   }
 
   log("[WiFi] Ready");
-  Serial.print("[WiFi] IP address: ");
-  log(WiFi.localIP());
   previousWifiMillis = millis();
 }
 

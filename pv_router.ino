@@ -46,6 +46,10 @@ Measure measure(&tank, &temperature);
 Network network(&measure, &tank);
 Clock routerClock(&measure, &tank);
 
+TaskHandle_t CriticalThreadTask;
+TaskHandle_t AccessoryThreadTask;
+TaskHandle_t LauncherThreadTask;
+
 unsigned long previousBlinkMillis;
 bool blink = false;
 
@@ -73,6 +77,10 @@ void initSequence() {
 }
 
 void setup() { 
+  xTaskCreatePinnedToCore(launcherThread, "Launcher thread", 10000, NULL, 2, &LauncherThreadTask, 1); 
+}
+
+void launcherThread(void* parameter) {
   pinMode(LedRed, OUTPUT);
   pinMode(LedGreen, OUTPUT);
   pinMode(LedBlue, OUTPUT);
@@ -81,50 +89,76 @@ void setup() {
   Serial.begin(115200);
   log("[Sys] Booting");
   readEEPROM();
+  int accTask = xTaskCreatePinnedToCore(accessoryThread, "Accessory thread", 10000, NULL, 10, &AccessoryThreadTask, 0); 
+  if (accTask) {
+    log("[Sys] Accessory thread created");
+  } else {
+    log("[Sys] Error while creating accessory thread");
+  }
+  int critTask = xTaskCreatePinnedToCore(criticalThread, "Critical thread", 10000, NULL, 10, &CriticalThreadTask, 1);
+  if (critTask) {
+    log("[Sys] Critical thread created");
+  } else {
+    log("[Sys] Error while creating critical thread");
+  }
+}
+
+void criticalThread(void* parameter) {
+  // setup
   // mandatory in 2.0.7 NodeMCU-32S board, interrupt cannot be set before setup
   log("[Sys] Measures setup");
   measure.setup();
+  // loop
+  for(;;) {
+    measure.update();
+  }
+}
+
+void accessoryThread(void* parameter) {
+  // setup
   log("[Sys] Network setup");
   network.setup();
   log("[Sys] One wire temperature setup");
   temperature.setup();
   previousBlinkMillis = millis();
-  tank.update();
   initOTA();
+  // loop
+  for(;;) {
+    tank.update();
+    network.update();
+    routerClock.update();
+    temperature.update();
+    if (millis() - previousBlinkMillis >= 2000) {
+      blink = !blink;
+      if (blink) {
+        previousBlinkMillis = millis() - 1950;
+      } else {
+        previousBlinkMillis = millis();
+      }
+      if (!measure.isPowerConnected) {
+        digitalWrite(LedRed, blink);
+        digitalWrite(LedGreen, blink);        
+      } else if (measure.overProduction) {
+        digitalWrite(LedRed, LOW);
+        digitalWrite(LedGreen, blink);
+      } else {
+        digitalWrite(LedRed, blink);
+        digitalWrite(LedGreen, LOW);
+      }
+      if ((tank.getMode() & TANK_MODE_ON_MASK) > 0) {
+        digitalWrite(LedBlue, HIGH);      
+      } else {
+        digitalWrite(LedBlue, LOW);
+      }
+    }
+    Debug.handle();
+    ArduinoOTA.handle();
+    vTaskDelay(50);
+  }
 }
 
 void loop() {
-  measure.update();
-  network.update();
-  routerClock.update();
-  temperature.update();
-  tank.update();
 
-   if (millis() - previousBlinkMillis >= 2000) {
-    blink = !blink;
-    if (blink) {
-      previousBlinkMillis = millis() - 1950;
-    } else {
-      previousBlinkMillis = millis();
-    }
-    if (!measure.isPowerConnected) {
-      digitalWrite(LedRed, blink);
-      digitalWrite(LedGreen, blink);        
-    } else if (measure.overProduction) {
-      digitalWrite(LedRed, LOW);
-      digitalWrite(LedGreen, blink);
-    } else {
-      digitalWrite(LedRed, blink);
-      digitalWrite(LedGreen, LOW);
-    }
-    if ((tank.getMode() & TANK_MODE_ON_MASK) > 0) {
-      digitalWrite(LedBlue, HIGH);      
-    } else {
-      digitalWrite(LedBlue, LOW);
-    }
-  }
-  Debug.handle();
-  ArduinoOTA.handle();
 }
 
 void initOTA() {
