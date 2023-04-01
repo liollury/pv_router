@@ -12,15 +12,16 @@ Temperature::Temperature() {
   sensor.requestTemperatures();
 }
 
+void Temperature::setup() {
+#ifdef READ_ONE_WIRE_SENSORS_ADDRESS
+  char cMsg[40];
+  sprintf(cMsg, "[Temperature] Device connected: %d", sensor.getDeviceCount());
+  log(cMsg);
+  this->readSensorsAddress();
+#endif
+}
+
 void Temperature::update() {
-  if (this->previousComputeMillis == 0) {
-    char cMsg[40];
-    sprintf(cMsg, "[Temperature] Device connected: %d", sensor.getDeviceCount());
-    log(cMsg);
-    #ifdef READ_ONE_WIRE_SENSORS_ADDRESS
-    this->readSensorsAddress();
-    #endif
-  }
   if (millis() - this->previousComputeMillis > 2000) {
     this->previousComputeMillis = millis();
     sensor.requestTemperatures();

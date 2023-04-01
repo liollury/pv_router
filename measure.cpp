@@ -20,7 +20,7 @@ Measure::Measure(Tank* tank, Temperature* temperatureSensor) {
   this->previousComputeMillis = millis();
 }
 
-void Measure::init() {
+void Measure::setup() {
   pinMode(ZeroCross, INPUT);
   pinMode(PulseTriac, OUTPUT);
   digitalWrite(PulseTriac, LOW);

@@ -9,7 +9,7 @@ static const char* password = SECRET_WIFI_PASSWORD;
 
 //ONE WIRE - to determinate with READ_ONE_WIRE_SENSORS_ADDRESS to print addresses
 #define READ_ONE_WIRE_SENSORS_ADDRESS
-static uint8_t TankOneWireTempSensor[8] = { 0x28, 0x06, 0xBD, 0x49, 0xF6, 0x8D, 0x3C, 0x9B };
+static uint8_t TankOneWireTempSensor[8] = { 0x28, 0xA3, 0xDC, 0x49, 0xF6, 0x86, 0x3C, 0xD3 };
 static uint8_t TriacOneWireTempSensor[8] = { 0x28, 0x29, 0x86, 0x48, 0xF6, 0x33, 0x3C, 0xAC };
 
 //PINS - GPIO
@@ -26,7 +26,7 @@ static const int dallasOneWire = 14;
 //CALIBRATION
 static const float kV = 0.18453;    //Calibration coefficient for the voltage. To be adjusted
 static const float kI = 0.085; // valeur avec bouilloir : 0.048203 valeur avec linky : 0.052988   //Calibration coefficient for the current. To be adjusted
-static const int minTriacDelay = 60; // 0-100; maxLoadPower = 100% - minTriacDelay * loadPower. eg.: minTriacDelay = 80, load = 3kw, maxLoadPower = 3000 * 20% = 600w
+static const int minTriacDelay = 57; // 0-100; maxLoadPower = 100% - minTriacDelay * loadPower. eg.: minTriacDelay = 80, load = 3kw, maxLoadPower = 3000 * 20% = 600w
 static const int powerMargin = 30; // Allowable injection (W)
 
 //TANK MODES

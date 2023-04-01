@@ -31,7 +31,7 @@ class Measure {
     float triacTemperature;
     bool overProduction = false;
     Measure(Tank* tank, Temperature* temperatureSensor);
-    void init();
+    void setup();
     void measurePower();
     void computePower();
     void computeTriacDelay();

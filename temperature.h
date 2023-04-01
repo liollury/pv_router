@@ -9,6 +9,7 @@ class Temperature {
     unsigned long previousComputeMillis = 0;
   public:
     Temperature();
+    void setup();
     void update();
     float getTemperature(DeviceAddress addr);
     #ifdef READ_ONE_WIRE_SENSORS_ADDRESS

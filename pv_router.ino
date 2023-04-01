@@ -76,16 +76,18 @@ void setup() {
   pinMode(LedRed, OUTPUT);
   pinMode(LedGreen, OUTPUT);
   pinMode(LedBlue, OUTPUT);
-  // mandatory in 2.0.7 NodeMCU-32S board, interrupt cannot be set before setup
-  measure.init();
-  // secure triac to low
-  measure.stopTriac();
   initSequence();
   Debug.begin(esp_name);
   Serial.begin(115200);
   log("[Sys] Booting");
   readEEPROM();
+  // mandatory in 2.0.7 NodeMCU-32S board, interrupt cannot be set before setup
+  log("[Sys] Measures setup");
+  measure.setup();
+  log("[Sys] Network setup");
   network.setup();
+  log("[Sys] One wire temperature setup");
+  temperature.setup();
   previousBlinkMillis = millis();
   tank.update();
   initOTA();

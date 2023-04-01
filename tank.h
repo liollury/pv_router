@@ -6,7 +6,7 @@
 class Tank {
   private:
     int mode = TANK_MODE_AUTO_OFF;
-    float temperature = 45.5;
+    float temperature = 999;
     float targetTemperature = 70;
     unsigned long previousComputeMillis;
     Temperature* temperatureSensor;
