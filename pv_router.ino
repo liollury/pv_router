@@ -89,25 +89,25 @@ void launcherThread(void* parameter) {
   Serial.begin(115200);
   log("[Sys] Booting");
   readEEPROM();
-  int accTask = xTaskCreatePinnedToCore(accessoryThread, "Accessory thread", 10000, NULL, 10, &AccessoryThreadTask, 0); 
-  if (accTask) {
-    log("[Sys] Accessory thread created");
-  } else {
-    log("[Sys] Error while creating accessory thread");
-  }
-  int critTask = xTaskCreatePinnedToCore(criticalThread, "Critical thread", 10000, NULL, 10, &CriticalThreadTask, 1);
-  if (critTask) {
-    log("[Sys] Critical thread created");
-  } else {
-    log("[Sys] Error while creating critical thread");
-  }
-}
-
-void criticalThread(void* parameter) {
   // setup
+  log("[Sys] Network setup");
+  network.setup();
+  log("[Sys] One wire temperature setup");
+  temperature.setup();
   // mandatory in 2.0.7 NodeMCU-32S board, interrupt cannot be set before setup
   log("[Sys] Measures setup");
   measure.setup();
+  previousBlinkMillis = millis();
+  initOTA();
+
+  xTaskCreatePinnedToCore(accessoryThread, "Accessory thread", 10000, NULL, 10, &AccessoryThreadTask, 0);
+  delay(500);  
+  xTaskCreatePinnedToCore(criticalThread, "Critical thread", 10000, NULL, 10, &CriticalThreadTask, 1);
+  delay(500);
+}
+
+void criticalThread(void* parameter) {
+  log("[Sys] Critical thread created");
   // loop
   for(;;) {
     measure.update();
@@ -115,13 +115,7 @@ void criticalThread(void* parameter) {
 }
 
 void accessoryThread(void* parameter) {
-  // setup
-  log("[Sys] Network setup");
-  network.setup();
-  log("[Sys] One wire temperature setup");
-  temperature.setup();
-  previousBlinkMillis = millis();
-  initOTA();
+  log("[Sys] Accessory thread created");
   // loop
   for(;;) {
     tank.update();
@@ -158,7 +152,7 @@ void accessoryThread(void* parameter) {
 }
 
 void loop() {
-
+    vTaskDelay(1000);
 }
 
 void initOTA() {
