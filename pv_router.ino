@@ -107,7 +107,10 @@ void loop() {
     } else {
       previousBlinkMillis = millis();
     }
-    if (measure.overProduction) {
+    if (!measure.isPowerConnected) {
+      digitalWrite(LedRed, blink);
+      digitalWrite(LedGreen, blink);        
+    } else if (measure.overProduction) {
       digitalWrite(LedRed, LOW);
       digitalWrite(LedGreen, blink);
     } else {
