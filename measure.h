@@ -28,7 +28,7 @@ class Measure {
     bool isPowerConnected = false; 
     float powerFactor;
     int triacDelay = 100;
-    float triacTemperature;
+    float triacTemperature = 999;
     bool overProduction = false;
     Measure(Tank* tank, Temperature* temperatureSensor);
     void setup();
