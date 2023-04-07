@@ -22,11 +22,11 @@ void Tank::setMode(int mode) {
 }
 
 int Tank::getMode() {
-  int mode = TANK_MODE_AUTO_OFF;
+  int result = TANK_MODE_AUTO_OFF;
   xSemaphoreTake(tankMutex, TANK_SEMAPHORE_BLOCK_DELAY);
-  mode = this->mode;
+  result = this->mode;
   xSemaphoreGive(tankMutex);
-  return mode;
+  return result;
 }
 
 void Tank::setTemperature(float temperature) {
@@ -41,11 +41,11 @@ void Tank::setTemperature(float temperature) {
 }
 
 float Tank::getTemperature() {
-  float temperature = 999;
+  float result = 999;
   xSemaphoreTake(tankMutex, TANK_SEMAPHORE_BLOCK_DELAY);
-  temperature = this->temperature;
+  result = this->temperature;
   xSemaphoreGive(tankMutex);
-  return temperature;
+  return result;
 }
 
 void Tank::setTargetTemperature(float temperature) {
@@ -60,11 +60,11 @@ void Tank::setTargetTemperature(float temperature) {
 }
 
 float Tank::getTargetTemperature() {
-  float targetTemperature = 0;
+  float result = 0;
   xSemaphoreTake(tankMutex, TANK_SEMAPHORE_BLOCK_DELAY);
-  temperature = this->targetTemperature;
+  result = this->targetTemperature;
   xSemaphoreGive(tankMutex);
-  return targetTemperature;
+  return result;
 }
 
 bool Tank::reachedTargetTemperature() {
