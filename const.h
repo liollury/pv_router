@@ -28,8 +28,8 @@ static const float kV = 0.18453;    //Calibration coefficient for the voltage. T
 static const float kI = 0.085; // valeur avec bouilloir : 0.048203 valeur avec linky : 0.052988   //Calibration coefficient for the current. To be adjusted
 static const int minTriacDelay = 55; // 0-100; maxLoadPower = 100% - minTriacDelay * loadPower. eg.: minTriacDelay = 80, load = 3kw, maxLoadPower = 3000 * 20% = 600w
 static const int loadPower = 3000; // load is 3kW
-static const int triacLoadStep = loadPower / 100; // how many W per %age of triac
-static const int powerMargin = 2 * triacLoadStep; // Allowable injection (W)
+static const int triacLoadStep = 100; // how many W per %age of triac, lower value is best precision but make "yoyo" triac position, default 200
+static const int powerMargin = 2 * loadPower / 100; // Allowable injection (W)
 
 //TANK MODES
 static const int TANK_MODE_AUTO_ON = 0b11;

@@ -38,7 +38,7 @@
 #include "logger.h"
 #include "const.h"
 #include <EEPROM.h>
-#include <ArduinoOTA.h>
+// #include <ArduinoOTA.h>
 
 Temperature temperature;
 Tank tank(&temperature);
@@ -77,7 +77,7 @@ void initSequence() {
 }
 
 void setup() { 
-  xTaskCreatePinnedToCore(launcherThread, "Launcher thread", 10000, NULL, 2, &LauncherThreadTask, 1); 
+  xTaskCreatePinnedToCore(launcherThread, "Launcher thread", 10000, NULL, 10, &LauncherThreadTask, 1); 
 }
 
 void launcherThread(void* parameter) {
@@ -98,12 +98,14 @@ void launcherThread(void* parameter) {
   log("[Sys] Measures setup");
   measure.setup();
   previousBlinkMillis = millis();
-  initOTA();
+  // initOTA();
 
   xTaskCreatePinnedToCore(accessoryThread, "Accessory thread", 10000, NULL, 10, &AccessoryThreadTask, 0);
-  delay(500);  
+  vTaskDelay(500);
+  // criticalThread(NULL);
   xTaskCreatePinnedToCore(criticalThread, "Critical thread", 10000, NULL, 10, &CriticalThreadTask, 1);
-  delay(500);
+  vTaskDelay(500);
+  vTaskDelete(LauncherThreadTask);
 }
 
 void criticalThread(void* parameter) {
@@ -112,6 +114,7 @@ void criticalThread(void* parameter) {
   for(;;) {
     measure.update();
   }
+  vTaskDelete(CriticalThreadTask);
 }
 
 void accessoryThread(void* parameter) {
@@ -146,16 +149,17 @@ void accessoryThread(void* parameter) {
       }
     }
     Debug.handle();
-    ArduinoOTA.handle();
+    // ArduinoOTA.handle();
     vTaskDelay(50);
   }
+  vTaskDelete(AccessoryThreadTask);
 }
 
 void loop() {
     vTaskDelay(1000);
 }
 
-void initOTA() {
+/*void initOTA() {
   ArduinoOTA.setPort(3232);
   ArduinoOTA.setHostname("ESP32-PVRouter");
   ArduinoOTA.setPassword(OTA_PASSWD);
@@ -186,4 +190,4 @@ void initOTA() {
   });
 
   ArduinoOTA.begin();
-}
+}*/
