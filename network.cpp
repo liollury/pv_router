@@ -2,7 +2,7 @@
 #include "const.h"
 #include "logger.h"
 #include <WiFi.h>
-#include <EEPROM.h>
+#include "memory.h"
 #include <WebServer.h>
 
 WebServer server(8080);
@@ -36,16 +36,28 @@ void Network::generateRestData() {
   server.send(200, "application/json", this->buffer);
 }
 
+void Network::handleErrorLog() {
+  int data[13];
+  readLogData(data, 13);
+  char error[100];
+  sprintf(error, "[%i,%i,%i,%i,%i,%i,%i,%i,%i,%i,%i,%i,%i]", data[0], data[1], data[2], data[3], data[4], data[5], data[6], data[7], data[8], data[9], data[10], data[11], data[12]);
+  server.send(200, "application/json", error);
+}
+
+void Network::handleResetErrorLog() {
+  int data[13];
+  for(int i = 0; i < 13; i++) { data[i] = 0; }
+  writeLogData(data, 13);
+  server.send(200, "text/html", "<h1>OK</h1>");
+}
+
 void Network::handleTargetTemperature() {
   float temperature = server.arg("temperature").toFloat();
   if (temperature != temperature || temperature < 40 || temperature > 80) { // NaN or out of bound
     server.send(400, "text/html", "<h1>Value must be float between 40 and 80</h1>");
   } else {
-    EEPROM.begin(128);
-    EEPROM.put(0, temperature);
+    writeTemperatureToEEPROM(temperature);
     this->tank->setTargetTemperature(temperature);
-    EEPROM.commit();
-    EEPROM.end();
     server.send(200, "text/html", "<h1>OK</h1>");
   }
 }
@@ -79,6 +91,7 @@ void Network::setupWifi() {
   WiFi.hostname(esp_name);
   log("[WiFi] Connecting...");
   WiFi.begin(ssid, password);
+  WiFi.setAutoReconnect(true);
   while (WiFi.waitForConnectResult() != WL_CONNECTED) {
     log("[WiFi] Connection Failed! Rebooting...");
     this->measure->stopTriac();
@@ -98,28 +111,39 @@ void Network::setupWebServer() {
   server.on("/setTargetTemperature", [=](){handleTargetTemperature();});
   server.on("/setTankMode", [=](){handleTankMode();});
   server.on("/restart", [=](){handleRestart();});
+  server.on("/resetLog", [=](){handleResetErrorLog();});
+  server.on("/log", [=](){handleErrorLog();});
   server.onNotFound([=](){handleNotFound();});
   server.begin();
   log("[WebServer] HTTP server started");
   log("[WebServer] Liveness endpoint : http://" + WiFi.localIP().toString() + ":8080/");
   log("[WebServer] Data endpoint : http://" + WiFi.localIP().toString() + ":8080/data");
-  log("[WebServer] Data endpoint : http://" + WiFi.localIP().toString() + ":8080/setTargetTemperature?temperature=XX");
-  log("[WebServer] Data endpoint : http://" + WiFi.localIP().toString() + ":8080/setTankMode?mode=[0=off, 1=auto_off, 2=on, 3=auto_on]");
+  log("[WebServer] Tank target temperature endpoint : http://" + WiFi.localIP().toString() + ":8080/setTargetTemperature?temperature=XX");
+  log("[WebServer] Tank mode endpoint : http://" + WiFi.localIP().toString() + ":8080/setTankMode?mode=[0=off, 1=auto_off, 2=on, 3=auto_on]");
   log("[WebServer] Restart endpoint : http://" + WiFi.localIP().toString() + ":8080/restart");
+  log("[WebServer] Reset log endpoint : http://" + WiFi.localIP().toString() + ":8080/resetLog");
+  log("[WebServer] Error log endpoint : http://" + WiFi.localIP().toString() + ":8080/log");
 }
 
 
 void Network::wifiWatchdog() {
   if (millis() - this->previousWifiMillis > 30000) {
     this->previousWifiMillis = millis();
-    if (WiFi.waitForConnectResult() != WL_CONNECTED) {
+    if (WiFi.waitForConnectResult(30000) != WL_CONNECTED) {
       log("[WiFi] Connection Failed! #" + String(WIFIbug));
       this->WIFIbug++;
+      if (this->WIFIbug == 1) {
+        int data[13];
+        readLogData(data, 13);
+        data[1]++;
+        writeLogData(data, 13);
+      }
       if (this->WIFIbug > 20) {
         this->measure->stopTriac();
         delay(1000);
         ESP.restart();
       }
+      WiFi.reconnect();
     } else {
       this->WIFIbug = 0;
     }

@@ -20,6 +20,8 @@ class Network {
     void handleOnConnect();
     void handleTankMode();
     void handleTargetTemperature();
+    void handleErrorLog();
+    void handleResetErrorLog();
     void handleRestart();
     void handleNotFound();
   public:

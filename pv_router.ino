@@ -37,7 +37,7 @@
 #include "clock.h"
 #include "logger.h"
 #include "const.h"
-#include <EEPROM.h>
+#include "memory.h"
 // #include <ArduinoOTA.h>
 
 Temperature temperature;
@@ -53,16 +53,6 @@ TaskHandle_t LauncherThreadTask;
 unsigned long previousBlinkMillis;
 bool blink = false;
 
-void readEEPROM() {
-  EEPROM.begin(128);
-  float tankTargetTemperature;
-  EEPROM.get(0, tankTargetTemperature);
-  if (tankTargetTemperature != tankTargetTemperature || tankTargetTemperature < 40 || tankTargetTemperature > 80) { // NaN or out of bound
-    tankTargetTemperature = 55;
-  }
-  tank.setTargetTemperature(tankTargetTemperature);
-  EEPROM.end();
-}
 
 void initSequence() {
   digitalWrite(LedRed, HIGH);
@@ -76,7 +66,17 @@ void initSequence() {
   digitalWrite(LedBlue, LOW);
 }
 
+
+void logBootCause() {
+  int data[13];
+  readLogData(data, 13);
+  data[0]++;
+  data[2 + esp_reset_reason()]++;
+  writeLogData(data, 13);
+}
+
 void setup() { 
+  logBootCause();
   xTaskCreatePinnedToCore(launcherThread, "Launcher thread", 10000, NULL, 10, &LauncherThreadTask, 1); 
 }
 
@@ -88,7 +88,7 @@ void launcherThread(void* parameter) {
   Debug.begin(esp_name);
   Serial.begin(115200);
   log("[Sys] Booting");
-  readEEPROM();
+  tank.setTargetTemperature(readTemperatureFromEEPROM());
   // setup
   log("[Sys] Network setup");
   network.setup();
