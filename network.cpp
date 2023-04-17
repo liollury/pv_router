@@ -88,14 +88,30 @@ void Network::handleRestart() {
 }
 
 void Network::setupWifi() {
+  WiFi.mode(WIFI_STA);
   WiFi.hostname(esp_name);
-  log("[WiFi] Connecting...");
-  WiFi.begin(ssid, password);
   WiFi.setAutoReconnect(true);
-  while (WiFi.waitForConnectResult() != WL_CONNECTED) {
+  int retryCount = 0;
+  while (WiFi.status() != WL_CONNECTED && retryCount < 10) {
+    WiFi.disconnect();
+    vTaskDelay(100);
+    log("[WiFi] Connecting...");
+    WiFi.begin(ssid, password);
+    int connectionWait = 0;
+    while (WiFi.status() != WL_CONNECTED && connectionWait < 15) {
+      vTaskDelay(500);
+      connectionWait++;
+    }
+    if (WiFi.status() != WL_CONNECTED) {
+      log("[WiFi] Connection Failed! Retry...");
+      log(WiFi.status());
+    }
+    retryCount++;
+  }
+  if (WiFi.status() != WL_CONNECTED) {
     log("[WiFi] Connection Failed! Rebooting...");
     this->measure->stopTriac();
-    delay(5000);
+    delay(1000);
     ESP.restart();
   }
 
@@ -129,8 +145,7 @@ void Network::setupWebServer() {
 void Network::wifiWatchdog() {
   if (millis() - this->previousWifiMillis > 30000) {
     this->previousWifiMillis = millis();
-    if (WiFi.waitForConnectResult(30000) != WL_CONNECTED) {
-      log("[WiFi] Connection Failed! #" + String(WIFIbug));
+    if (WiFi.status() != WL_CONNECTED) {
       this->WIFIbug++;
       if (this->WIFIbug == 1) {
         int data[13];
@@ -138,14 +153,7 @@ void Network::wifiWatchdog() {
         data[1]++;
         writeLogData(data, 13);
       }
-      if (this->WIFIbug > 20) {
-        this->measure->stopTriac();
-        delay(1000);
-        ESP.restart();
-      }
-      WiFi.reconnect();
-    } else {
-      this->WIFIbug = 0;
+      this->setupWifi();
     }
   }  
 }
