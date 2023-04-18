@@ -1,7 +1,6 @@
 #include "network.h"
 #include "const.h"
 #include "logger.h"
-#include <WiFi.h>
 #include "memory.h"
 #include <WebServer.h>
 
@@ -37,17 +36,17 @@ void Network::generateRestData() {
 }
 
 void Network::handleErrorLog() {
-  int data[13];
-  readLogData(data, 13);
+  int data[ERROR_LOG_SIZE];
+  readLogData(data, ERROR_LOG_SIZE);
   char error[100];
-  sprintf(error, "[%i,%i,%i,%i,%i,%i,%i,%i,%i,%i,%i,%i,%i]", data[0], data[1], data[2], data[3], data[4], data[5], data[6], data[7], data[8], data[9], data[10], data[11], data[12]);
+  sprintf(error, "[%i,%i,%i,%i,%i,%i,%i,%i,%i,%i,%i,%i,%i,%i]", data[0], data[1], data[2], data[3], data[4], data[5], data[6], data[7], data[8], data[9], data[10], data[11], data[12], data[13]);
   server.send(200, "application/json", error);
 }
 
 void Network::handleResetErrorLog() {
-  int data[13];
-  for(int i = 0; i < 13; i++) { data[i] = 0; }
-  writeLogData(data, 13);
+  int data[ERROR_LOG_SIZE];
+  for(int i = 0; i < ERROR_LOG_SIZE; i++) { data[i] = 0; }
+  writeLogData(data, ERROR_LOG_SIZE);
   server.send(200, "text/html", "<h1>OK</h1>");
 }
 
@@ -88,10 +87,32 @@ void Network::handleRestart() {
 }
 
 void Network::setupWifi() {
+  WiFi.disconnect(true);
+  WiFi.mode(WIFI_OFF);
+  vTaskDelay(100);
   WiFi.mode(WIFI_STA);
-  WiFi.hostname(esp_name);
-  WiFi.setAutoReconnect(true);
+  WiFi.onEvent([=](WiFiEvent_t event, WiFiEventInfo_t info){disconnectEvent(event, info);}, WiFiEvent_t::ARDUINO_EVENT_WIFI_STA_DISCONNECTED);
+  WiFi.config(INADDR_NONE, INADDR_NONE, INADDR_NONE, INADDR_NONE);
+  WiFi.setHostname(ESP_NAME);
+}
+
+void Network::disconnectEvent(WiFiEvent_t event, WiFiEventInfo_t info) {
+  char cMsg[70];
+  sprintf(cMsg, "[WiFi] Disconnected event detected (%i), try to reconnect", info.wifi_sta_disconnected.reason);
+  log(cMsg);
+  int data[ERROR_LOG_SIZE];
+  readLogData(data, ERROR_LOG_SIZE);
+  data[1]++;
+  data[13] = info.wifi_sta_disconnected.reason;
+  writeLogData(data, ERROR_LOG_SIZE);
+  if (!this->connecting) {
+    this->connect();
+  }
+}
+
+void Network::connect() {
   int retryCount = 0;
+  this->connecting = true;
   while (WiFi.status() != WL_CONNECTED && retryCount < 10) {
     WiFi.disconnect();
     vTaskDelay(100);
@@ -104,16 +125,17 @@ void Network::setupWifi() {
     }
     if (WiFi.status() != WL_CONNECTED) {
       log("[WiFi] Connection Failed! Retry...");
-      log(WiFi.status());
     }
     retryCount++;
   }
+  this->connecting = false;
   if (WiFi.status() != WL_CONNECTED) {
     log("[WiFi] Connection Failed! Rebooting...");
     this->measure->stopTriac();
     delay(1000);
     ESP.restart();
   }
+  this->WIFIbug = 0;
 
   log("[WiFi] Ready");
   previousWifiMillis = millis();
@@ -142,21 +164,21 @@ void Network::setupWebServer() {
 }
 
 
-void Network::wifiWatchdog() {
-  if (millis() - this->previousWifiMillis > 30000) {
-    this->previousWifiMillis = millis();
-    if (WiFi.status() != WL_CONNECTED) {
-      this->WIFIbug++;
-      if (this->WIFIbug == 1) {
-        int data[13];
-        readLogData(data, 13);
-        data[1]++;
-        writeLogData(data, 13);
-      }
-      this->setupWifi();
-    }
-  }  
-}
+// void Network::wifiWatchdog() {
+//   if (millis() - this->previousWifiMillis > 30000) {
+//     this->previousWifiMillis = millis();
+//     if (WiFi.status() != WL_CONNECTED) {
+//       this->WIFIbug++;
+//       if (this->WIFIbug == 1) {
+//         int data[ERROR_LOG_SIZE];
+//         readLogData(data, ERROR_LOG_SIZE);
+//         data[1]++;
+//         writeLogData(data, ERROR_LOG_SIZE);
+//       }
+//       this->connect();
+//     }
+//   }  
+// }
 
 void Network::handleWebserverClient() {
   server.handleClient();
@@ -164,10 +186,11 @@ void Network::handleWebserverClient() {
 
 void Network::setup() {
   this->setupWifi();
+  this->connect();
   this->setupWebServer();
 }
 
 void Network::update() {
   this->handleWebserverClient();
-  this->wifiWatchdog();
+  // this->wifiWatchdog();
 }

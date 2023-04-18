@@ -3,6 +3,7 @@
 #include "tank.h"
 #include "measure.h"
 #include <ArduinoJson.h>
+#include <WiFi.h>
 
 #ifndef Network_h
 #define Network_h
@@ -12,9 +13,12 @@ class Network {
     char buffer[270];
     int WIFIbug = 0;
     unsigned long previousWifiMillis;
+    bool connecting = false;
     Measure* measure;
     Tank* tank;
     void setupWifi();
+    void connect();
+    void disconnectEvent(WiFiEvent_t event, WiFiEventInfo_t info);
     void setupWebServer();
     void generateRestData();
     void handleOnConnect();
@@ -27,7 +31,7 @@ class Network {
   public:
     Network(Measure* measure, Tank* tank);
     void setup();
-    void wifiWatchdog();
+    // void wifiWatchdog();
     void handleWebserverClient();
     void update();
 };
