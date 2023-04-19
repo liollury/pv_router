@@ -37,8 +37,7 @@
 #include "clock.h"
 #include "logger.h"
 #include "const.h"
-#include <EEPROM.h>
-// #include <ArduinoOTA.h>
+#include "memory.h"
 
 Temperature temperature;
 Tank tank(&temperature);
@@ -53,42 +52,48 @@ TaskHandle_t LauncherThreadTask;
 unsigned long previousBlinkMillis;
 bool blink = false;
 
-void readEEPROM() {
-  EEPROM.begin(128);
-  float tankTargetTemperature;
-  EEPROM.get(0, tankTargetTemperature);
-  if (tankTargetTemperature != tankTargetTemperature || tankTargetTemperature < 40 || tankTargetTemperature > 80) { // NaN or out of bound
-    tankTargetTemperature = 55;
-  }
-  tank.setTargetTemperature(tankTargetTemperature);
-  EEPROM.end();
-}
 
 void initSequence() {
+  digitalWrite(LedBlue, HIGH);
+  delay(500);
+  digitalWrite(LedBlue, LOW);
   digitalWrite(LedRed, HIGH);
   delay(500);
   digitalWrite(LedRed, LOW);
   digitalWrite(LedGreen, HIGH);
   delay(500);
   digitalWrite(LedGreen, LOW);
-  digitalWrite(LedBlue, HIGH);
-  delay(500);
-  digitalWrite(LedBlue, LOW);
+}
+
+
+void logBootCause() {
+  int data[ERROR_LOG_SIZE];
+  readLogData(data, ERROR_LOG_SIZE);
+  data[0]++;
+  data[2 + esp_reset_reason()]++;
+  writeLogData(data, ERROR_LOG_SIZE);
 }
 
 void setup() { 
-  xTaskCreatePinnedToCore(launcherThread, "Launcher thread", 10000, NULL, 10, &LauncherThreadTask, 1); 
+  logBootCause();
+  #ifdef RUN_DUAL_CORE_PROGRAM
+  log("[Sys] Start program in dual core mode");
+  xTaskCreatePinnedToCore(launcherThread, "Launcher thread", 10000, NULL, 2, &LauncherThreadTask, 1); 
+  #else
+  log("[Sys] Start program in single core mode");
+  launcherWorker();
+  #endif
 }
 
-void launcherThread(void* parameter) {
+void launcherWorker() {
   pinMode(LedRed, OUTPUT);
   pinMode(LedGreen, OUTPUT);
   pinMode(LedBlue, OUTPUT);
   initSequence();
-  Debug.begin(esp_name);
+  Debug.begin(ESP_NAME);
   Serial.begin(115200);
   log("[Sys] Booting");
-  readEEPROM();
+  tank.setTargetTemperature(readTemperatureFromEEPROM());
   // setup
   log("[Sys] Network setup");
   network.setup();
@@ -98,96 +103,89 @@ void launcherThread(void* parameter) {
   log("[Sys] Measures setup");
   measure.setup();
   previousBlinkMillis = millis();
-  // initOTA();
-
-  xTaskCreatePinnedToCore(accessoryThread, "Accessory thread", 10000, NULL, 10, &AccessoryThreadTask, 0);
-  vTaskDelay(500);
-  // criticalThread(NULL);
-  xTaskCreatePinnedToCore(criticalThread, "Critical thread", 10000, NULL, 10, &CriticalThreadTask, 1);
-  vTaskDelay(500);
-  vTaskDelete(LauncherThreadTask);
 }
 
+#ifdef RUN_DUAL_CORE_PROGRAM
+void launcherThread(void* parameter) {
+  launcherWorker();
+  xTaskCreatePinnedToCore(criticalThread, "Critical thread", 10000, NULL, 2, &CriticalThreadTask, CRITICAL_CORE);
+  vTaskDelay(500); 
+  xTaskCreatePinnedToCore(accessoryThread, "Accessory thread", 10000, NULL, 0, &AccessoryThreadTask, ACCESSORY_CORE);
+  vTaskDelay(500); 
+  vTaskDelete(LauncherThreadTask);
+}
+#endif
+
+void criticalWorker() {
+    measure.update();
+}
+
+#ifdef RUN_DUAL_CORE_PROGRAM
 void criticalThread(void* parameter) {
   log("[Sys] Critical thread created");
   // loop
   for(;;) {
-    measure.update();
+    criticalWorker();
+    vTaskDelay(20);
   }
   vTaskDelete(CriticalThreadTask);
 }
+#endif
 
+void accessoryWorker() {
+  tank.update();
+  network.update();
+  routerClock.update();
+  temperature.update();
+  if (millis() - previousBlinkMillis >= 2000) {
+    blink = !blink;
+    if (blink) {
+      previousBlinkMillis = millis() - 1950;
+    } else {
+      previousBlinkMillis = millis();
+    }
+    if (!network.isConnected()) {
+      digitalWrite(LedBlue, blink);
+    } else {
+      digitalWrite(LedBlue, LOW);
+    }
+    if (!measure.isPowerConnected) {
+      digitalWrite(LedRed, blink);
+      digitalWrite(LedGreen, blink);     
+    } else if (measure.overProduction) {
+      digitalWrite(LedRed, LOW);
+      digitalWrite(LedGreen, blink);
+    } else {
+      digitalWrite(LedRed, blink);
+      digitalWrite(LedGreen, LOW);
+    }
+    if ((tank.getMode() & TANK_MODE_ON_MASK) > 0) {
+      digitalWrite(LedBlue, HIGH);      
+    } else {
+      digitalWrite(LedBlue, LOW);
+    }
+  }
+  Debug.handle();
+}
+
+#ifdef RUN_DUAL_CORE_PROGRAM
 void accessoryThread(void* parameter) {
   log("[Sys] Accessory thread created");
   // loop
   for(;;) {
-    tank.update();
-    network.update();
-    routerClock.update();
-    temperature.update();
-    if (millis() - previousBlinkMillis >= 2000) {
-      blink = !blink;
-      if (blink) {
-        previousBlinkMillis = millis() - 1950;
-      } else {
-        previousBlinkMillis = millis();
-      }
-      if (!measure.isPowerConnected) {
-        digitalWrite(LedRed, blink);
-        digitalWrite(LedGreen, blink);        
-      } else if (measure.overProduction) {
-        digitalWrite(LedRed, LOW);
-        digitalWrite(LedGreen, blink);
-      } else {
-        digitalWrite(LedRed, blink);
-        digitalWrite(LedGreen, LOW);
-      }
-      if ((tank.getMode() & TANK_MODE_ON_MASK) > 0) {
-        digitalWrite(LedBlue, HIGH);      
-      } else {
-        digitalWrite(LedBlue, LOW);
-      }
-    }
-    Debug.handle();
-    // ArduinoOTA.handle();
+    accessoryWorker();
     vTaskDelay(50);
   }
   vTaskDelete(AccessoryThreadTask);
 }
+#endif
 
 void loop() {
-    vTaskDelay(1000);
+  #ifdef RUN_DUAL_CORE_PROGRAM
+  vTaskDelay(1000);
+  #else
+  criticalWorker();
+  accessoryWorker();
+  vTaskDelay(20);
+  #endif
 }
-
-/*void initOTA() {
-  ArduinoOTA.setPort(3232);
-  ArduinoOTA.setHostname("ESP32-PVRouter");
-  ArduinoOTA.setPassword(OTA_PASSWD);
-
-  ArduinoOTA.onStart([]() {
-    String type;
-    if (ArduinoOTA.getCommand() == U_FLASH)
-      type = "sketch";
-    else // U_SPIFFS
-      type = "filesystem";
-
-    // NOTE: if updating SPIFFS this would be the place to unmount SPIFFS using SPIFFS.end()
-    log("Start updating " + type);
-  })
-  .onEnd([]() {
-    log("\nEnd");
-  })
-  .onProgress([](unsigned int progress, unsigned int total) {
-    Serial.printf("Progress: %u%%\r", (progress / (total / 100)));
-  })
-  .onError([](ota_error_t error) {
-    Serial.printf("Error[%u]: ", error);
-    if (error == OTA_AUTH_ERROR) { log("Auth Failed"); }
-    else if (error == OTA_BEGIN_ERROR) { log("Begin Failed"); }
-    else if (error == OTA_CONNECT_ERROR) { log("Connect Failed"); }
-    else if (error == OTA_RECEIVE_ERROR) { log("Receive Failed"); }
-    else if (error == OTA_END_ERROR) { log("End Failed"); }
-  });
-
-  ArduinoOTA.begin();
-}*/
