@@ -6,7 +6,7 @@
 //WIFI
 static const char* WIFI_SSID = SECRET_WIFI_SSID;
 static const char* WIFI_PASSWD = SECRET_WIFI_PASSWORD;
-static const char* ESP_NAME = "ESP_PV_Router1";
+static const char* ESP_NAME = "ESP_PV_Router";
 static uint8_t WIFI_BSSID[] = { 0x00, 0x11, 0x32, 0x75, 0x81, 0xfd };
 
 
