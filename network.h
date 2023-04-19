@@ -13,7 +13,6 @@ class Network {
     char buffer[270];
     int WIFIbug = 0;
     unsigned long previousWifiMillis;
-    bool connecting = false;
     Measure* measure;
     Tank* tank;
     void setupWifi();
@@ -31,7 +30,7 @@ class Network {
   public:
     Network(Measure* measure, Tank* tank);
     void setup();
-    // void wifiWatchdog();
+    bool isConnected();
     void handleWebserverClient();
     void update();
 };

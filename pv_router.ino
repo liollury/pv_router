@@ -54,15 +54,15 @@ bool blink = false;
 
 
 void initSequence() {
+  digitalWrite(LedBlue, HIGH);
+  delay(500);
+  digitalWrite(LedBlue, LOW);
   digitalWrite(LedRed, HIGH);
   delay(500);
   digitalWrite(LedRed, LOW);
   digitalWrite(LedGreen, HIGH);
   delay(500);
   digitalWrite(LedGreen, LOW);
-  digitalWrite(LedBlue, HIGH);
-  delay(500);
-  digitalWrite(LedBlue, LOW);
 }
 
 
@@ -105,27 +105,32 @@ void launcherWorker() {
   previousBlinkMillis = millis();
 }
 
+#ifdef RUN_DUAL_CORE_PROGRAM
 void launcherThread(void* parameter) {
   launcherWorker();
-  xTaskCreatePinnedToCore(accessoryThread, "Accessory thread", 10000, NULL, 0, &AccessoryThreadTask, 0);
-  vTaskDelay(500);
-  xTaskCreatePinnedToCore(criticalThread, "Critical thread", 10000, NULL, 2, &CriticalThreadTask, 1);
-  vTaskDelay(500);  
+  xTaskCreatePinnedToCore(criticalThread, "Critical thread", 10000, NULL, 2, &CriticalThreadTask, CRITICAL_CORE);
+  vTaskDelay(500); 
+  xTaskCreatePinnedToCore(accessoryThread, "Accessory thread", 10000, NULL, 0, &AccessoryThreadTask, ACCESSORY_CORE);
+  vTaskDelay(500); 
   vTaskDelete(LauncherThreadTask);
 }
+#endif
 
 void criticalWorker() {
     measure.update();
 }
 
+#ifdef RUN_DUAL_CORE_PROGRAM
 void criticalThread(void* parameter) {
   log("[Sys] Critical thread created");
   // loop
   for(;;) {
     criticalWorker();
+    vTaskDelay(20);
   }
   vTaskDelete(CriticalThreadTask);
 }
+#endif
 
 void accessoryWorker() {
   tank.update();
@@ -139,9 +144,14 @@ void accessoryWorker() {
     } else {
       previousBlinkMillis = millis();
     }
+    if (!network.isConnected()) {
+      digitalWrite(LedBlue, blink);
+    } else {
+      digitalWrite(LedBlue, LOW);
+    }
     if (!measure.isPowerConnected) {
       digitalWrite(LedRed, blink);
-      digitalWrite(LedGreen, blink);        
+      digitalWrite(LedGreen, blink);     
     } else if (measure.overProduction) {
       digitalWrite(LedRed, LOW);
       digitalWrite(LedGreen, blink);
@@ -158,6 +168,7 @@ void accessoryWorker() {
   Debug.handle();
 }
 
+#ifdef RUN_DUAL_CORE_PROGRAM
 void accessoryThread(void* parameter) {
   log("[Sys] Accessory thread created");
   // loop
@@ -167,6 +178,7 @@ void accessoryThread(void* parameter) {
   }
   vTaskDelete(AccessoryThreadTask);
 }
+#endif
 
 void loop() {
   #ifdef RUN_DUAL_CORE_PROGRAM
@@ -174,5 +186,6 @@ void loop() {
   #else
   criticalWorker();
   accessoryWorker();
+  vTaskDelay(20);
   #endif
 }

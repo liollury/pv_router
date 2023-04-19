@@ -87,12 +87,8 @@ void Network::handleRestart() {
 }
 
 void Network::setupWifi() {
-  WiFi.disconnect(true);
-  WiFi.mode(WIFI_OFF);
-  vTaskDelay(100);
   WiFi.mode(WIFI_STA);
   WiFi.onEvent([=](WiFiEvent_t event, WiFiEventInfo_t info){disconnectEvent(event, info);}, WiFiEvent_t::ARDUINO_EVENT_WIFI_STA_DISCONNECTED);
-  WiFi.config(INADDR_NONE, INADDR_NONE, INADDR_NONE, INADDR_NONE);
   WiFi.setHostname(ESP_NAME);
 }
 
@@ -105,19 +101,21 @@ void Network::disconnectEvent(WiFiEvent_t event, WiFiEventInfo_t info) {
   data[1]++;
   data[13] = info.wifi_sta_disconnected.reason;
   writeLogData(data, ERROR_LOG_SIZE);
-  if (!this->connecting) {
-    this->connect();
-  }
+  this->connect();
 }
 
+SemaphoreHandle_t wifiMutex = xSemaphoreCreateMutex();
+
 void Network::connect() {
+  xSemaphoreTake(wifiMutex, portMAX_DELAY);
   int retryCount = 0;
-  this->connecting = true;
-  while (WiFi.status() != WL_CONNECTED && retryCount < 10) {
+  while (WiFi.status() != WL_CONNECTED && retryCount < 2) {
     WiFi.disconnect();
+    WiFi.mode(WIFI_OFF);
     vTaskDelay(100);
+    WiFi.mode(WIFI_STA);
     log("[WiFi] Connecting...");
-    WiFi.begin(ssid, password);
+    WiFi.begin(WIFI_SSID, WIFI_PASSWD, 0, WIFI_BSSID);
     int connectionWait = 0;
     while (WiFi.status() != WL_CONNECTED && connectionWait < 15) {
       vTaskDelay(500);
@@ -128,11 +126,11 @@ void Network::connect() {
     }
     retryCount++;
   }
-  this->connecting = false;
+  xSemaphoreGive(wifiMutex);
   if (WiFi.status() != WL_CONNECTED) {
     log("[WiFi] Connection Failed! Rebooting...");
     this->measure->stopTriac();
-    delay(1000);
+    vTaskDelay(1000);
     ESP.restart();
   }
   this->WIFIbug = 0;
@@ -164,21 +162,9 @@ void Network::setupWebServer() {
 }
 
 
-// void Network::wifiWatchdog() {
-//   if (millis() - this->previousWifiMillis > 30000) {
-//     this->previousWifiMillis = millis();
-//     if (WiFi.status() != WL_CONNECTED) {
-//       this->WIFIbug++;
-//       if (this->WIFIbug == 1) {
-//         int data[ERROR_LOG_SIZE];
-//         readLogData(data, ERROR_LOG_SIZE);
-//         data[1]++;
-//         writeLogData(data, ERROR_LOG_SIZE);
-//       }
-//       this->connect();
-//     }
-//   }  
-// }
+bool Network::isConnected() {
+  return WiFi.status() == WL_CONNECTED;
+}
 
 void Network::handleWebserverClient() {
   server.handleClient();
@@ -192,5 +178,4 @@ void Network::setup() {
 
 void Network::update() {
   this->handleWebserverClient();
-  // this->wifiWatchdog();
 }
