@@ -153,6 +153,8 @@ void Measure::update() {
       char cMsg[40];
       sprintf(cMsg, "[Measure] triac temperature: %fC", temperature);
       log(cMsg);
+    } else {
+      this->triacTemperature = 999;
     }
   }
 }

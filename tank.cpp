@@ -76,6 +76,8 @@ void Tank::update() {
     float temperatureC = this->temperatureSensor->getTemperature(TankOneWireTempSensor);
     if (temperatureC > 0) {
       this->setTemperature(temperatureC);
+    } else {
+      this->setTemperature(999);
     }
     this->previousComputeMillis = millis();
   }
