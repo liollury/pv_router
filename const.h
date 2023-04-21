@@ -53,6 +53,6 @@ static const int TANK_MODE_AUTO_MASK = 0b01;
 static const int TANK_MODE_ON_MASK = 0b10;
 
 //LOG
-static const int ERROR_LOG_SIZE = 14;
+static const int ERROR_LOG_SIZE = 16;
 
 #endif

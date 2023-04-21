@@ -1,6 +1,7 @@
 #include "temperature.h"
 #include "logger.h"
 #include "const.h"
+#include "memory.h"
 #include <Arduino.h>
 
 OneWire oneWire(dallasOneWire);
@@ -29,7 +30,15 @@ void Temperature::update() {
 }
 
 float Temperature::getTemperature(DeviceAddress addr) {
-  return sensor.getTempC(addr);
+  float result = sensor.getTempC(addr);
+  if (result < -100) {
+    int data[ERROR_LOG_SIZE];
+    readLogData(data, ERROR_LOG_SIZE);
+    data[14]++;
+    data[15] = result;
+    writeLogData(data, ERROR_LOG_SIZE);
+  }
+  return result;
 }
 
 #ifdef READ_ONE_WIRE_SENSORS_ADDRESS

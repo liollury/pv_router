@@ -36,6 +36,8 @@ static void writeTemperatureToEEPROM(float temperature) {
  * 11- ESP_RST_BROWNOUT,   //!< Brownout reset (software or hardware)
  * 12- ESP_RST_SDIO,       //!< Reset over SDIO
  * 13- Last Wifi disconnect reason
+ * 14- temperature sensor failures
+ * 15- temperature sensor last error code
  * 
  * Wifi disconnect reason list :
 * 
