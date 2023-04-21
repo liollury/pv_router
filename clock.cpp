@@ -12,7 +12,7 @@ Clock::Clock(Measure *measure, Tank* tank) {
 }
 
 void Clock::update() {
-  if (millis() - this->previousClockMillis > 30000) {
+  if (millis() - this->previousClockMillis > 60000) {
     this->previousClockMillis = millis();
     if(!getLocalTime(&timeinfo)){
       log("Failed to obtain time");
