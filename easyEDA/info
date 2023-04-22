@@ -1,0 +1,292 @@
+{
+  "uuid": "1797f6aedfb6e0ea1cfe2aa8c3bcaca3",
+  "path": "Offline/pv%20router",
+  "name": "pv router",
+  "content": "",
+  "created_at": "2023-02-11 21:00:19",
+  "updated_at": "2023-04-18 17:39:50",
+  "stick": "",
+  "documents": [
+    {
+      "uuid": "211405185453befddf05b014c31055b3",
+      "title": "Sheet_1",
+      "description": "",
+      "docType": "1",
+      "master": "",
+      "thumb": "/images/thumb-default.png",
+      "components": {
+        "134438baab5f4918a200d385055ecfc4": 1,
+        "a4eacdcb63554cb08b3b56477817ab57": 1,
+        "f0bc163659d742bc8f021d00cdeb85b2": 8,
+        "56994305955647eda299fec7cb5fcf23": 2,
+        "d138dec4253a42218011384dda2f21f3": 1,
+        "8a1cfbff89fb4040985ff1123f1d9ef4": 1,
+        "3721972c581d4f99b226effb1db7a790": 1,
+        "56f8b2b64a544f3d820bc0399720da54": 1,
+        "aac52597c6ec48e09ea3705a2f54d7d2": 1,
+        "2fe5a87765ae4c3f93002d61fc568f7b": 1,
+        "7673f34f99c1428db8c9a80b816cae35": 1
+      },
+      "BOM": [
+        [
+          "Value",
+          "Quantity",
+          "Package",
+          "Components",
+          "CustomPara"
+        ],
+        [
+          "Jack3.5mm",
+          1,
+          "JACK3.5MMB",
+          "1",
+          {
+            "BOM_Supplier Part": "",
+            "BOM_Supplier": "Global Componentes",
+            "BOM_Manufacturer Part": "",
+            "puuid": "20eb0a803b7d4f1caefc0ba4ceedd458",
+            "uuid": "8a1cfbff89fb4040985ff1123f1d9ef4"
+          }
+        ],
+        [
+          "470uF",
+          1,
+          "CAP-D4.0×F1.5",
+          "C1",
+          {
+            "BOM_Supplier Part": "",
+            "BOM_Supplier": "",
+            "BOM_Manufacturer Part": "",
+            "puuid": "d0dcff2f94d04daa9354f40d74908283",
+            "uuid": "56994305955647eda299fec7cb5fcf23"
+          }
+        ],
+        [
+          "10uF",
+          1,
+          "CAP-D4.0×F1.5",
+          "C2",
+          {
+            "BOM_Supplier Part": "",
+            "BOM_Supplier": "",
+            "BOM_Manufacturer Part": "",
+            "puuid": "d0dcff2f94d04daa9354f40d74908283",
+            "uuid": "56994305955647eda299fec7cb5fcf23"
+          }
+        ],
+        [
+          "1m",
+          1,
+          "L_AXIAL-0.6",
+          "L1",
+          {
+            "BOM_Supplier Part": "",
+            "BOM_Supplier": "",
+            "BOM_Manufacturer Part": "",
+            "puuid": "61cccdc8b5014f5786200c9b3d832328",
+            "uuid": "2fe5a87765ae4c3f93002d61fc568f7b"
+          }
+        ],
+        [
+          "1m",
+          1,
+          "L0603",
+          "L2",
+          {
+            "BOM_Supplier Part": "",
+            "BOM_Supplier": "",
+            "BOM_Manufacturer Part": "",
+            "puuid": "1f261cf72cb1479ca32177c31156ede3",
+            "uuid": "a4eacdcb63554cb08b3b56477817ab57"
+          }
+        ],
+        [
+          "Consommation",
+          1,
+          "LED-TH_BD3.0_RED",
+          "LED1",
+          {
+            "BOM_Manufacturer": "EVERLIGHT(台湾亿光)",
+            "BOM_Manufacturer Part": "204-10SDRD/S530-A3-L",
+            "BOM_Supplier Part": "C84774",
+            "BOM_Supplier": "LCSC",
+            "puuid": "bec79a4ea65a4f65ba290a03b598a762",
+            "uuid": "3721972c581d4f99b226effb1db7a790"
+          }
+        ],
+        [
+          "Production",
+          1,
+          "LED-TH_BD3.0_GREEN",
+          "LED2",
+          {
+            "BOM_Manufacturer": "EVERLIGHT(台湾亿光)",
+            "BOM_Manufacturer Part": "204-10SYGD/S530-E3",
+            "BOM_Supplier Part": "C85161",
+            "BOM_Supplier": "",
+            "puuid": "52107c2975c74633a8d8f531ccb01bc4",
+            "uuid": "56f8b2b64a544f3d820bc0399720da54"
+          }
+        ],
+        [
+          "Actif",
+          1,
+          "LED-TH_BD3.0_BLUE",
+          "LED3",
+          {
+            "BOM_Manufacturer": "EVERLIGHT(台湾亿光)",
+            "BOM_Manufacturer Part": "204-10SUBC/S400-A4",
+            "BOM_Supplier Part": "C86881",
+            "BOM_Supplier": "LCSC",
+            "puuid": "52c11d38b35a4fc594f3067d1697639d",
+            "uuid": "aac52597c6ec48e09ea3705a2f54d7d2"
+          }
+        ],
+        [
+          "20k",
+          1,
+          "R_AXIAL-0.4",
+          "R1",
+          {
+            "BOM_Supplier Part": "",
+            "BOM_Supplier": "",
+            "BOM_Manufacturer Part": "",
+            "puuid": "5905db98cde4487fbb177070aa85bbe1",
+            "uuid": "f0bc163659d742bc8f021d00cdeb85b2"
+          }
+        ],
+        [
+          "2.7k",
+          1,
+          "R_AXIAL-0.4",
+          "R2",
+          {
+            "BOM_Supplier Part": "",
+            "BOM_Supplier": "",
+            "BOM_Manufacturer Part": "",
+            "puuid": "5905db98cde4487fbb177070aa85bbe1",
+            "uuid": "f0bc163659d742bc8f021d00cdeb85b2"
+          }
+        ],
+        [
+          "10k",
+          2,
+          "R_AXIAL-0.4",
+          "R3,R4",
+          {
+            "BOM_Supplier Part": "",
+            "BOM_Supplier": "",
+            "BOM_Manufacturer Part": "",
+            "puuid": "5905db98cde4487fbb177070aa85bbe1",
+            "uuid": "f0bc163659d742bc8f021d00cdeb85b2"
+          }
+        ],
+        [
+          "1k",
+          3,
+          "R_AXIAL-0.4",
+          "R5,R6,R7",
+          {
+            "BOM_Supplier Part": "",
+            "BOM_Supplier": "",
+            "BOM_Manufacturer Part": "",
+            "puuid": "5905db98cde4487fbb177070aa85bbe1",
+            "uuid": "f0bc163659d742bc8f021d00cdeb85b2"
+          }
+        ],
+        [
+          "4.7k",
+          1,
+          "R_AXIAL-0.4",
+          "R8",
+          {
+            "BOM_Supplier Part": "",
+            "BOM_Supplier": "",
+            "BOM_Manufacturer Part": "",
+            "puuid": "5905db98cde4487fbb177070aa85bbe1",
+            "uuid": "f0bc163659d742bc8f021d00cdeb85b2"
+          }
+        ],
+        [
+          "RobotDyn AC Dimmer 16/24A",
+          1,
+          "ROBOTDYN AC DIMMER 16/24A",
+          "U1",
+          {
+            "BOM_Manufacturer": "RobotDyn",
+            "BOM_Manufacturer Part": "",
+            "BOM_Supplier Part": "",
+            "BOM_Supplier": "RobotDyn",
+            "puuid": "a346d54f158546068ceb5846b84ad1d2",
+            "uuid": "d138dec4253a42218011384dda2f21f3"
+          }
+        ],
+        [
+          "NODEMCU_ESP32S",
+          1,
+          "NODEMCU-ESP32S",
+          "U2",
+          {
+            "BOM_Manufacturer Part": "NodeMCU ESP32S-----",
+            "BOM_Supplier Part": "",
+            "BOM_Supplier": "",
+            "puuid": "59b5a2dbb93942c8aaa641a28ac5676e",
+            "uuid": "134438baab5f4918a200d385055ecfc4"
+          }
+        ],
+        [
+          "DS18B20+",
+          1,
+          "TO-92-3_L4.9-W3.7-P1.27-L",
+          "U3",
+          {
+            "BOM_Supplier": "LCSC",
+            "BOM_Manufacturer": "MAXIM(美信)",
+            "BOM_Manufacturer Part": "DS18B20+",
+            "BOM_Supplier Part": "C9753",
+            "BOM_JLCPCB Part Class": "Extended Part",
+            "puuid": "6924b36489de4921bb29ca14bf27c33f",
+            "uuid": "7673f34f99c1428db8c9a80b816cae35"
+          }
+        ]
+      ],
+      "updateTime": 1681832390,
+      "createTime": 1676145619,
+      "histories": [],
+      "created_at": "2023-02-11 21:00:19",
+      "updated_at": "2023-04-18 17:39:50"
+    },
+    {
+      "uuid": "fb549a75e2c745dd2c7640953ee12d6e",
+      "puuid": "1797f6aedfb6e0ea1cfe2aa8c3bcaca3",
+      "title": "PCB_pv router_2",
+      "filename": "PCB_pv router_2.json",
+      "description": "",
+      "docType": "3",
+      "master": "",
+      "thumb": "/images/thumb-default.png",
+      "components": {
+        "20eb0a803b7d4f1caefc0ba4ceedd458": 1,
+        "d0dcff2f94d04daa9354f40d74908283": 2,
+        "61cccdc8b5014f5786200c9b3d832328": 1,
+        "bec79a4ea65a4f65ba290a03b598a762": 1,
+        "52107c2975c74633a8d8f531ccb01bc4": 1,
+        "52c11d38b35a4fc594f3067d1697639d": 1,
+        "5905db98cde4487fbb177070aa85bbe1": 7,
+        "a346d54f158546068ceb5846b84ad1d2": 1,
+        "59b5a2dbb93942c8aaa641a28ac5676e": 1
+      },
+      "BOM": [],
+      "updateTime": 1676149046,
+      "createTime": 1676148790,
+      "histories": [],
+      "created_at": "2023-02-11 21:53:10",
+      "updated_at": "2023-02-11 21:57:26"
+    }
+  ],
+  "sort": [],
+  "title": "pv router",
+  "foldername": "pv router",
+  "schfilename": "pv router.json",
+  "schfilemtime": 1681832390730
+}
