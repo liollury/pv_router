@@ -37,8 +37,8 @@ void Network::generateRestData() {
 
 void Network::handleErrorLog() {
   readLogData();
-  char error[100];
-  sprintf(error, "[%i,%i,%i,%i,%i,%i,%i,%i,%i,%i,%i,%i,%i,%i,%i,%i]", errorLogData[0], errorLogData[1], errorLogData[2], errorLogData[3], errorLogData[4], errorLogData[5], errorLogData[6], errorLogData[7], errorLogData[8], errorLogData[9], errorLogData[10], errorLogData[11], errorLogData[12], errorLogData[13], errorLogData[14], errorLogData[15]);
+  char error[120];
+  sprintf(error, "[%i,%i,%i,%i,%i,%i,%i,%i,%i,%i,%i,%i,%i,%i,%i,%i,%i]", errorLogData[0], errorLogData[1], errorLogData[2], errorLogData[3], errorLogData[4], errorLogData[5], errorLogData[6], errorLogData[7], errorLogData[8], errorLogData[9], errorLogData[10], errorLogData[11], errorLogData[12], errorLogData[13], errorLogData[14], errorLogData[15], errorLogData[16]);
   server.send(200, "application/json", error);
 }
 

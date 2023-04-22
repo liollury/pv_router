@@ -147,7 +147,7 @@ void Measure::update() {
 
   if (millis() - this->previousTemperatureMillis > 10000) {
     this->previousTemperatureMillis = millis();
-    float temperature = this->temperatureSensor->getTemperature(TriacOneWireTempSensor);
+    float temperature = this->temperatureSensor->getTemperature(TriacOneWireTempSensor, TriacOneWireBus);
     if (temperature > 0) {
       if (temperature != this->triacTemperature) {
         this->triacTemperature = temperature;

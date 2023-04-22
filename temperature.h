@@ -11,7 +11,7 @@ class Temperature {
     Temperature();
     void setup();
     void update();
-    float getTemperature(DeviceAddress addr);
+    float getTemperature(DeviceAddress addr, int bus);
     #ifdef READ_ONE_WIRE_SENSORS_ADDRESS
     void readSensorsAddress();
     #endif

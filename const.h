@@ -23,6 +23,8 @@ static const int ACCESSORY_CORE = MAIN_WIFI_CORE;
 #define READ_ONE_WIRE_SENSORS_ADDRESS
 static uint8_t TankOneWireTempSensor[8] = { 0x28, 0xA3, 0xDC, 0x49, 0xF6, 0x86, 0x3C, 0xD3 };
 static uint8_t TriacOneWireTempSensor[8] = { 0x28, 0x29, 0x86, 0x48, 0xF6, 0x33, 0x3C, 0xAC };
+static int TriacOneWireBus = 1;
+static int TankOneWireBus = 2;
 #ifdef RUN_DUAL_CORE_PROGRAM
 //#define WAIT_FOR_REQUEST_TEMPERATURE
 #endif
@@ -37,7 +39,8 @@ static const int PulseTriac = 22;
 static const int LedRed = 19;
 static const int LedGreen = 18;
 static const int LedBlue = 5;
-static const int dallasOneWire = 17;
+static const int dallasOneWireBus1 = 16;
+static const int dallasOneWireBus2 = 17;
 
 //CALIBRATION
 static const float kV = 0.18453;    //Calibration coefficient for the voltage. To be adjusted
@@ -57,6 +60,6 @@ static const int TANK_MODE_AUTO_MASK = 0b01;
 static const int TANK_MODE_ON_MASK = 0b10;
 
 //LOG
-static const int ERROR_LOG_SIZE = 16;
+static const int ERROR_LOG_SIZE = 17;
 
 #endif
