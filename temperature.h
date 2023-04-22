@@ -15,5 +15,7 @@ class Temperature {
     #ifdef READ_ONE_WIRE_SENSORS_ADDRESS
     void readSensorsAddress();
     #endif
+  private:
+    void updateSensors();
 };
 #endif

@@ -3,6 +3,8 @@
 #ifndef Memory_h
 #define Memory_h
 
+static int errorLogData[ERROR_LOG_SIZE];
+
 static float readTemperatureFromEEPROM() {
   EEPROM.begin(128);
   float tankTargetTemperature;
@@ -70,22 +72,28 @@ static void writeTemperatureToEEPROM(float temperature) {
  * WIFI_REASON_ASSOC_FAIL               = 203,
  * WIFI_REASON_HANDSHAKE_TIMEOUT        = 204,
  */
-static void writeLogData(int data[], int size) {
+static void writeLogData(int data[]) {
   EEPROM.begin(128);
   int address = sizeof(float);
-  for (int i = 0; i < size; i++) {
+  for (int i = 0; i < ERROR_LOG_SIZE; i++) {
     EEPROM.writeInt(address, data[i]);
+    errorLogData[i] = data[i];
     address += sizeof(int);
   }
   EEPROM.commit();
   EEPROM.end();
 }
 
-static void readLogData(int data[], int size) {
+static void resetLogData() {
+  for(int i = 0; i < ERROR_LOG_SIZE; i++) { errorLogData[i] = 0; }
+  writeLogData(errorLogData);
+}
+
+static void readLogData() {
   EEPROM.begin(128);
   int address = sizeof(float);
-  for (int i = 0; i < size; i++) {
-    EEPROM.get(address, data[i]);
+  for (int i = 0; i < ERROR_LOG_SIZE; i++) {
+    EEPROM.get(address, errorLogData[i]);
     address += sizeof(int);
   }
   EEPROM.end();

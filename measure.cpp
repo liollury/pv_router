@@ -145,14 +145,16 @@ void Measure::update() {
     }
   }
 
-  if (millis() - this->previousTemperatureMillis > 5000) {
+  if (millis() - this->previousTemperatureMillis > 10000) {
     this->previousTemperatureMillis = millis();
     float temperature = this->temperatureSensor->getTemperature(TriacOneWireTempSensor);
     if (temperature > 0) {
-      this->triacTemperature = temperature;
-      char cMsg[40];
-      sprintf(cMsg, "[Measure] triac temperature: %fC", temperature);
-      log(cMsg);
+      if (temperature != this->triacTemperature) {
+        this->triacTemperature = temperature;
+        char cMsg[40];
+        sprintf(cMsg, "[Measure] triac temperature: %fC", temperature);
+        log(cMsg);
+      }
     } else {
       this->triacTemperature = 999;
     }

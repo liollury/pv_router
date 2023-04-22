@@ -36,17 +36,14 @@ void Network::generateRestData() {
 }
 
 void Network::handleErrorLog() {
-  int data[ERROR_LOG_SIZE];
-  readLogData(data, ERROR_LOG_SIZE);
+  readLogData();
   char error[100];
-  sprintf(error, "[%i,%i,%i,%i,%i,%i,%i,%i,%i,%i,%i,%i,%i,%i,%i,%i]", data[0], data[1], data[2], data[3], data[4], data[5], data[6], data[7], data[8], data[9], data[10], data[11], data[12], data[13], data[14], data[15]);
+  sprintf(error, "[%i,%i,%i,%i,%i,%i,%i,%i,%i,%i,%i,%i,%i,%i,%i,%i]", errorLogData[0], errorLogData[1], errorLogData[2], errorLogData[3], errorLogData[4], errorLogData[5], errorLogData[6], errorLogData[7], errorLogData[8], errorLogData[9], errorLogData[10], errorLogData[11], errorLogData[12], errorLogData[13], errorLogData[14], errorLogData[15]);
   server.send(200, "application/json", error);
 }
 
 void Network::handleResetErrorLog() {
-  int data[ERROR_LOG_SIZE];
-  for(int i = 0; i < ERROR_LOG_SIZE; i++) { data[i] = 0; }
-  writeLogData(data, ERROR_LOG_SIZE);
+  resetLogData();
   server.send(200, "text/html", "<h1>OK</h1>");
 }
 
@@ -96,11 +93,10 @@ void Network::disconnectEvent(WiFiEvent_t event, WiFiEventInfo_t info) {
   char cMsg[70];
   sprintf(cMsg, "[WiFi] Disconnected event detected (%i), try to reconnect", info.wifi_sta_disconnected.reason);
   log(cMsg);
-  int data[ERROR_LOG_SIZE];
-  readLogData(data, ERROR_LOG_SIZE);
-  data[1]++;
-  data[13] = info.wifi_sta_disconnected.reason;
-  writeLogData(data, ERROR_LOG_SIZE);
+  readLogData();
+  errorLogData[1]++;
+  errorLogData[13] = info.wifi_sta_disconnected.reason;
+  writeLogData(errorLogData);
   this->connect();
 }
 

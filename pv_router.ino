@@ -67,11 +67,10 @@ void initSequence() {
 
 
 void logBootCause() {
-  int data[ERROR_LOG_SIZE];
-  readLogData(data, ERROR_LOG_SIZE);
-  data[0]++;
-  data[2 + esp_reset_reason()]++;
-  writeLogData(data, ERROR_LOG_SIZE);
+  readLogData();
+  errorLogData[0]++;
+  errorLogData[2 + esp_reset_reason()]++;
+  writeLogData(errorLogData);
 }
 
 void setup() { 

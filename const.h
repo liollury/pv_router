@@ -10,11 +10,6 @@ static const char* ESP_NAME = "ESP_PV_Router";
 static uint8_t WIFI_BSSID[] = { 0x00, 0x11, 0x32, 0x75, 0x81, 0xfd };
 
 
-//ONE WIRE - to determinate with READ_ONE_WIRE_SENSORS_ADDRESS to print addresses
-#define READ_ONE_WIRE_SENSORS_ADDRESS
-static uint8_t TankOneWireTempSensor[8] = { 0x28, 0xA3, 0xDC, 0x49, 0xF6, 0x86, 0x3C, 0xD3 };
-static uint8_t TriacOneWireTempSensor[8] = { 0x28, 0x29, 0x86, 0x48, 0xF6, 0x33, 0x3C, 0xAC };
-
 //Dual core configuration
 #define MAIN_WIFI_CORE 1
 #define SECONDARY_CORE 0
@@ -23,6 +18,15 @@ static uint8_t TriacOneWireTempSensor[8] = { 0x28, 0x29, 0x86, 0x48, 0xF6, 0x33,
 static const int CRITICAL_CORE = SECONDARY_CORE;
 static const int ACCESSORY_CORE = MAIN_WIFI_CORE;
 #endif
+
+//ONE WIRE - to determinate with READ_ONE_WIRE_SENSORS_ADDRESS to print addresses
+#define READ_ONE_WIRE_SENSORS_ADDRESS
+static uint8_t TankOneWireTempSensor[8] = { 0x28, 0xA3, 0xDC, 0x49, 0xF6, 0x86, 0x3C, 0xD3 };
+static uint8_t TriacOneWireTempSensor[8] = { 0x28, 0x29, 0x86, 0x48, 0xF6, 0x33, 0x3C, 0xAC };
+#ifdef RUN_DUAL_CORE_PROGRAM
+//#define WAIT_FOR_REQUEST_TEMPERATURE
+#endif
+
 
 //PINS - GPIO
 static const int AnalogRef = 35;
