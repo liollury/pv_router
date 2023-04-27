@@ -59,7 +59,7 @@ float Temperature::getTemperature(DeviceAddress addr, int bus) {
     writeLogData(errorLogData);
   }
   // If last update is old, call new one
-  if (millis() - this->previousComputeMillis > 8000) {
+  if (millis() - this->previousComputeMillis > 8000 && bus == TankOneWireBus) {
     this->updateSensors();
   }
   return result;
