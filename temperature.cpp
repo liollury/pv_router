@@ -15,7 +15,7 @@ DallasTemperature sensorsBus[] = {sensorsB1, sensorsB2};
 Temperature::Temperature() {
   for(int bus = 0; bus < busCount; bus++) { 
     sensorsBus[bus].begin();
-    sensorsBus[bus].setResolution(11);
+    sensorsBus[bus].setResolution(ResolutionOnDallasBus[bus]);
     #ifndef WAIT_FOR_REQUEST_TEMPERATURE
     sensorsBus[bus].setWaitForConversion(false);
     #endif

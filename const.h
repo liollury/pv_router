@@ -25,8 +25,9 @@ static uint8_t TankOneWireTempSensor[8] = { 0x28, 0xA3, 0xDC, 0x49, 0xF6, 0x86, 
 static uint8_t TriacOneWireTempSensor[8] = { 0x28, 0x29, 0x86, 0x48, 0xF6, 0x33, 0x3C, 0xAC };
 static int TriacOneWireBus = 1;
 static int TankOneWireBus = 2;
+static int ResolutionOnDallasBus[2] = {9, 11}; // 9, 10, 11, or 12-bits, which correspond to 0.5°C, 0.25°C, 0.125°C, and 0.0625°C
 #ifdef RUN_DUAL_CORE_PROGRAM
-//#define WAIT_FOR_REQUEST_TEMPERATURE
+#define WAIT_FOR_REQUEST_TEMPERATURE
 #endif
 
 
