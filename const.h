@@ -21,13 +21,14 @@ static const int ACCESSORY_CORE = MAIN_WIFI_CORE;
 
 //ONE WIRE - to determinate with READ_ONE_WIRE_SENSORS_ADDRESS to print addresses
 #define READ_ONE_WIRE_SENSORS_ADDRESS
+#define ACCEPTABLE_TEMPERATURE_READING_FAIL 2
 static uint8_t TankOneWireTempSensor[8] = { 0x28, 0xA3, 0xDC, 0x49, 0xF6, 0x86, 0x3C, 0xD3 };
 static uint8_t TriacOneWireTempSensor[8] = { 0x28, 0x29, 0x86, 0x48, 0xF6, 0x33, 0x3C, 0xAC };
 static int TriacOneWireBus = 1;
 static int TankOneWireBus = 2;
 static int ResolutionOnDallasBus[2] = {9, 11}; // 9, 10, 11, or 12-bits, which correspond to 0.5°C, 0.25°C, 0.125°C, and 0.0625°C
 #ifdef RUN_DUAL_CORE_PROGRAM
-#define WAIT_FOR_REQUEST_TEMPERATURE
+//#define WAIT_FOR_REQUEST_TEMPERATURE
 #endif
 
 
@@ -49,7 +50,7 @@ static const float kI = 0.085; // valeur avec bouilloir : 0.048203 valeur avec l
 static const int minTriacDelay = 55; // 0-100; maxLoadPower = 100% - minTriacDelay * loadPower. eg.: minTriacDelay = 80, load = 3kw, maxLoadPower = 3000 * 20% = 600w
 static const int loadPower = 3000; // load is 3kW
 static const int triacLoadStep = 100; // how many W per %age of triac, lower value is best precision but make "yoyo" triac position, default 200
-static const int powerMargin = 2 * loadPower / 100; // Allowable injection (W)
+static const int powerMargin = 3 * loadPower / 100; // Allowable injection (W)
 
 //TANK MODES
 static const int TANK_MODE_AUTO_ON = 0b11;

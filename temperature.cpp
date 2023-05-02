@@ -11,6 +11,7 @@ OneWire oneWireB2(dallasOneWireBus2);
 DallasTemperature sensorsB2(&oneWireB2);
 
 DallasTemperature sensorsBus[] = {sensorsB1, sensorsB2};
+static SemaphoreHandle_t temperatureUpdateMutex = xSemaphoreCreateMutex();
 
 Temperature::Temperature() {
   for(int bus = 0; bus < busCount; bus++) { 
@@ -37,10 +38,12 @@ void Temperature::setup() {
 }
 
 void Temperature::updateSensors() {
-    this->previousComputeMillis = millis();
-    for(int bus = 0; bus < busCount; bus++) { 
-      sensorsBus[bus].requestTemperatures();
-    }
+  this->previousComputeMillis = millis();
+  for(int bus = 0; bus < busCount; bus++) { 
+    xSemaphoreTake(temperatureUpdateMutex, portMAX_DELAY);
+    sensorsBus[bus].requestTemperatures();
+    xSemaphoreGive(temperatureUpdateMutex);
+  }
 }
 
 void Temperature::update() {
@@ -50,16 +53,26 @@ void Temperature::update() {
   }
 }
 
-float Temperature::getTemperature(DeviceAddress addr, int bus) {
+float Temperature::getTemperature(DeviceAddress addr, int bus, float fallbackTemperature, float failTemperature) {
+  xSemaphoreTake(temperatureUpdateMutex, portMAX_DELAY);
   float result = sensorsBus[bus - 1].getTempC(addr);
+  xSemaphoreGive(temperatureUpdateMutex);
   if (result < -100) {
-    readLogData();
-    errorLogData[14 + bus - 1]++;
-    errorLogData[16] = result;
-    writeLogData(errorLogData);
+    this->failCount++;
+    if (this->failCount >= ACCEPTABLE_TEMPERATURE_READING_FAIL) {
+      readLogData();
+      errorLogData[14 + bus - 1]++;
+      errorLogData[16] = result;
+      writeLogData(errorLogData);
+      result = failTemperature;
+    } else {
+      result = fallbackTemperature;
+    }
+  } else {
+    this->failCount = 0;
   }
   // If last update is old, call new one
-  if (millis() - this->previousComputeMillis > 8000 && bus == TankOneWireBus) {
+  if (millis() - this->previousComputeMillis > 9000 && xPortGetCoreID() == ACCESSORY_CORE) {
     this->updateSensors();
   }
   return result;

@@ -7,11 +7,13 @@
 class Temperature {
   private:
     unsigned long previousComputeMillis = 0;
+    int failCount = 0;
+
   public:
     Temperature();
     void setup();
     void update();
-    float getTemperature(DeviceAddress addr, int bus);
+    float getTemperature(DeviceAddress addr, int bus, float fallbackTemperature, float failTemperature);
     #ifdef READ_ONE_WIRE_SENSORS_ADDRESS
     void readSensorsAddress();
     #endif
