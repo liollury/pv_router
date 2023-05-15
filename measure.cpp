@@ -60,9 +60,6 @@ void Measure::measurePower() {
   int index;
   this->refVolt = analogRead(AnalogRef);
   unsigned long MeasureMillis = millis();
-  /*Serial.print(this->refVolt);
-  Serial.print('-');
-  Serial.println(analogRead(AnalogAmp));*/
 
   while (millis() - MeasureMillis < 21) {                             //Read values in continuous during 20ms. One loop is around 150 micro seconds
     index = ((micros() % 20000) / 200 + 100 - zeroCrossingMs) % 100;  //We have more results that we need during 20ms to fill the tables of 100 samples

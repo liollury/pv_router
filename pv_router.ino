@@ -31,6 +31,8 @@
   * NTPClient v3.2.1
   */
 
+#define CONFIG_LWIP_DHCP_DOES_ARP_CHECK 0
+#define DHCP_DOES_ARP_CHECK 0
 
 #include "network.h"
 #include "measure.h"
@@ -76,8 +78,8 @@ void logBootCause() {
 void setup() { 
   logBootCause();
   #ifdef RUN_DUAL_CORE_PROGRAM
-  log("[Sys] Start program in dual core mode");
   xTaskCreatePinnedToCore(launcherThread, "Launcher thread", 10000, NULL, 2, &LauncherThreadTask, 1); 
+  log("[Sys] Start program in dual core mode");
   #else
   log("[Sys] Start program in single core mode");
   launcherWorker();
