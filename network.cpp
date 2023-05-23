@@ -21,7 +21,11 @@ void Network::generateRestData() {
   if (this->measure->triacTemperature != 999) {
     this->jsonDocument["triacTemperature"] = this->measure->triacTemperature;
   }
+  #ifdef MANAGE_TRIAC_ON_HALF_PERIOD
+  this->jsonDocument["triacPosition"] = 50 - (this->measure->triacDelay / 2); // (100 - delay)%
+  #else
   this->jsonDocument["triacPosition"] = 100 - this->measure->triacDelay; // (100 - delay)%
+  #endif
   this->jsonDocument["overProduction"] = this->measure->overProduction;
   this->jsonDocument["consumption"] = this->measure->Wh / 1000;
   this->jsonDocument["tankMode"] = this->tank->getMode();

@@ -45,9 +45,14 @@ static const int dallasOneWireBus1 = 16;
 static const int dallasOneWireBus2 = 17;
 
 //CALIBRATION
+#define MANAGE_TRIAC_ON_HALF_PERIOD // Triac will run only on half period, it will divide max power by 2 but reduce interference. You must adapt minTriacDelay
 static const float kV = 0.18453;    //Calibration coefficient for the voltage. To be adjusted
 static const float kI = 0.085; // valeur avec bouilloir : 0.048203 valeur avec linky : 0.052988   //Calibration coefficient for the current. To be adjusted
+#ifdef MANAGE_TRIAC_ON_HALF_PERIOD
+static const int minTriacDelay = 0; // 0-100; maxLoadPower = 100% - minTriacDelay * loadPower / 2. eg.: minTriacDelay = 80, load = 3kw, maxLoadPower = 3000 * 20% / 2 = 300w
+#else
 static const int minTriacDelay = 55; // 0-100; maxLoadPower = 100% - minTriacDelay * loadPower. eg.: minTriacDelay = 80, load = 3kw, maxLoadPower = 3000 * 20% = 600w
+#endif
 static const int loadPower = 3000; // load is 3kW
 static const int triacLoadStep = 100; // how many W per %age of triac, lower value is best precision but make "yoyo" triac position, default 200
 static const int powerMargin = 3 * loadPower / 100; // Allowable injection (W)

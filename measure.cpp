@@ -51,7 +51,11 @@ void IRAM_ATTR Measure::zeroCrossInterrupt() {
 
 void IRAM_ATTR Measure::onTimerInterrupt() {  //Interruption every 100 micro second
   this->currentTriacPosition += 1;
+  #ifdef MANAGE_TRIAC_ON_HALF_PERIOD
+  if (this->currentTriacPosition > this->triacDelay && this->triacDelay < 98 && this->isPowerConnected && !this->syncLost && this->phasePositive) {  //100 steps in 10 ms
+  #else
   if (this->currentTriacPosition > this->triacDelay && this->triacDelay < 98 && this->isPowerConnected && !this->syncLost) {  //100 steps in 10 ms
+  #endif
     digitalWrite(PulseTriac, HIGH); //Activate Triac
   }
 }
