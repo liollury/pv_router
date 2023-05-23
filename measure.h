@@ -23,10 +23,8 @@ class Measure {
     bool syncLost = false;
   public:
     float pW;
-    float pVA;
     float Wh = 0;
     bool isPowerConnected = false; 
-    float powerFactor;
     int triacDelay = 100;
     float triacTemperature = 999;
     bool overProduction = false;

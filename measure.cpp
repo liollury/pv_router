@@ -38,7 +38,7 @@ void Measure::setup() {
 }
 
 void IRAM_ATTR Measure::zeroCrossInterrupt() {
-  if ((millis() - this->lastZeroCrossInterruption) > 2) {  // to avoid glitch detection during 2ms
+  if ((millis() - this->lastZeroCrossInterruption) > 8) {  // to avoid glitch detection during 2ms
     this->currentTriacPosition = 0; //Time synchro every 10ms
     this->lastZeroCrossInterruption = millis();
     digitalWrite(PulseTriac, LOW);  //Stop Triac
@@ -94,14 +94,10 @@ void Measure::computePower() {
   this->isPowerConnected = (rmsVoltage > 190 && rmsVoltage < 280);
   if (this->isPowerConnected) {
     this->pW = this->pW / 100;
-    this->pVA = floor(rmsVoltage * rmsCurrent);
-    this->powerFactor = floor(100 * pW / pVA) / 100;
     this->Wh += this->pW / 90000;  // Watt Hour, Every 40ms
     this->pW = floor(this->pW);
   } else {
     this->pW = 0;
-    this->pVA = 0;
-    this->powerFactor = 0;
   }
   // log(this->pW);
 }
