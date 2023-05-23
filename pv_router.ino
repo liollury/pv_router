@@ -141,7 +141,7 @@ void accessoryWorker() {
   if (millis() - previousBlinkMillis >= 2000) {
     blink = !blink;
     if (blink) {
-      previousBlinkMillis = millis() - 1950;
+      previousBlinkMillis = millis() - 1900;
     } else {
       previousBlinkMillis = millis();
     }
@@ -151,7 +151,7 @@ void accessoryWorker() {
       digitalWrite(LedBlue, LOW);
     }
     if (!measure.isPowerConnected) {
-      digitalWrite(LedRed, blink);
+      digitalWrite(LedRed, !blink);
       digitalWrite(LedGreen, blink);     
     } else if (measure.overProduction) {
       digitalWrite(LedRed, LOW);
