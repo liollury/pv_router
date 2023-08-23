@@ -7,7 +7,8 @@
 static const char* WIFI_SSID = SECRET_WIFI_SSID;
 static const char* WIFI_PASSWD = SECRET_WIFI_PASSWORD;
 static const char* ESP_NAME = "ESP_PV_Router";
-static uint8_t WIFI_BSSID[] = { 0x00, 0x11, 0x32, 0x75, 0x81, 0xfd };
+static uint8_t WIFI_BSSID[] = { 0xdc, 0x00, 0xb0, 0xc2, 0x96, 0x92 };
+//static uint8_t WIFI_BSSID[] = { 0x00, 0x11, 0x32, 0x75, 0x81, 0xfd }; // router synology
 
 
 //Dual core configuration
