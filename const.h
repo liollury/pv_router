@@ -12,8 +12,8 @@ static uint8_t WIFI_BSSID[] = { 0xdc, 0x00, 0xb0, 0xc2, 0x96, 0x92 };
 
 
 //Dual core configuration
-#define MAIN_WIFI_CORE 1
-#define SECONDARY_CORE 0
+#define MAIN_WIFI_CORE 0
+#define SECONDARY_CORE 1
 #define RUN_DUAL_CORE_PROGRAM
 #ifdef RUN_DUAL_CORE_PROGRAM
 static const int CRITICAL_CORE = SECONDARY_CORE;
