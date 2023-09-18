@@ -151,7 +151,7 @@ void accessoryWorker() {
       digitalWrite(LedBlue, LOW);
     }
     if (!measure.isPowerConnected) {
-      digitalWrite(LedRed, !blink);
+      digitalWrite(LedRed, blink);
       digitalWrite(LedGreen, blink);     
     } else if (measure.overProduction) {
       digitalWrite(LedRed, LOW);
