@@ -8,9 +8,9 @@ In the standard case, it allows the surplus solar energy to be injected into a h
 ## Safety reminder
 Before connecting the router to the electrical grid, ensure compliance with local electrical safety standards:
 
-Use properly insulated cables to avoid short circuits.
-Install protective devices, such as circuit breakers, to prevent overloads and short circuits.
-If unsure, seek the assistance of a qualified professional for installation.
+- Use properly insulated cables to avoid short circuits.
+- Install protective devices, such as circuit breakers, to prevent overloads and short circuits.
+- If unsure, seek the assistance of a qualified professional for installation.
 
 ## Wire
 
